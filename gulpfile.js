@@ -37,28 +37,28 @@ var cfg = {
 	html : { src: [srcPath + "/**/*.html", "!"+srcPath + "/*.html"]},
 
 
-// vendor css src globs
-bootstrap_sass: { src: bowerPath + "/bootstrap-sass/assets/stylesheets/" },
+	// vendor css src globs
+	bootstrap_sass: { src: bowerPath + "/bootstrap-sass/assets/stylesheets/" },
 
-// vendor fonts src globs
-bootstrap_fonts: { src: bowerPath + "/bootstrap-sass/assets/fonts/**/**" },
+	// vendor fonts src globs
+	bootstrap_fonts: { src: bowerPath + "/bootstrap-sass/assets/fonts/**/**" },
 
-// vendor js src globs
-jquery: { src:bowerPath + "/jquery2/jquery.js" },
-bootstrap_js: { src: bowerPath + "/bootstrap-sass/assets/javascripts/bootstrap.js" },
-angular: { src: bowerPath + "/angular/angular.js" },
-angular_ui_router: { src: bowerPath + "/angular-ui-router/release/angular-ui-router.js" },
-angular_resource: { src: bowerPath + "angular-resource/angular-resource.js" },
-
-
-// vendor build locations
-vendor_js: { bld: vendorBuildPath + "/javascrips" },
-vendor_css: { bld: vendorBuildPath + "/stylesheets" },
-vendor_fonts : { bld: vendorBuildPath + "/stylesheets/fonts" },
+	// vendor js src globs
+	jquery : { src:bowerPath + "/jquery2/jquery.js" },
+	bootstrap_js : { src: bowerPath + "/bootstrap-sass/assets/javascripts/bootstrap.js" },
+	angular : { src: bowerPath + "/angular/angular.js" },
+	angular_ui_router : { src: bowerPath + "/angular-ui-router/release/angular-ui-router.js" },
+	angular_resource : { src: bowerPath + "angular-resource/angular-resource.js" },
 
 
-apiUrl : { dev: "http://localhost:3000",
-	prd: "https://capstone-staged.herokuapp.com" },
+	// vendor build locations
+	vendor_js : { bld: vendorBuildPath + "/javascrips" },
+	vendor_css : { bld: vendorBuildPath + "/stylesheets" },
+	vendor_fonts : { bld: vendorBuildPath + "/stylesheets/fonts" },
+
+
+	apiUrl : { dev: "http://localhost:3000",
+		prd: "https://capstone-staged.herokuapp.com" },
 
 };
 
@@ -140,6 +140,37 @@ gulp.task("browserSync", ["build"], () => {
 gulp.task("run", ["build", "browserSync"], () => {
 	// expression to watch() within even if we need to pre-process source code
 	gulp.watch(cfg.css.src, ["css"]);
+});
+
+// build assets referenced from root-level HTML file and create refs in HTML file
+gulp.task("dist:assets", ["build"], () => {
+    return gulp.src(cfg.root_html.src).pipe(debug())
+        .pipe(useref({ searchPath: devResourcePath}))
+        .pipe(gulpif(["**/*constant.js"], replace(cfg.apiUrl.dev, cfg.apiUrl.prd))) // change URLs
+        .pipe(gulpif(["**/*.js"], uglify())) // Minify JS
+        .pipe(gulpif(["**/*.css"], cssMin())) // Minify CSS
+        .pipe(gulp.dest(distPath)).pipe(debug());
+});
+
+// build/copy over font resources into dist tree
+gulp.task("dist:fonts", () => {
+    return gulp.src(cfg.vendor_fonts.bld + "/**/*", { base: cfg.vendor_css.bld})
+        .pipe(gulp.dest(distPath));
+});
+
+// build/copy over HTML resources into dist tree
+gulp.task("dist:html", () => {
+    return gulp.src(cfg.html.src).pipe(debug())
+        .pipe(htmlMin({ collapseWhitespace: true })) // minify HTML
+        .pipe(gulp.dest(distPath)).pipe(debug());
+});
+
+// build all dist artifact ready for deployments
+gulp.task("dist", sync.sync(["clean:dist", "build", "dist:assets", "dist:fonts", "dist:html"]));
+
+// execute the dist webapp in a web server
+gulp.task("dist:run", ["dist"], () => {
+    browserSyncInit(distPath);
 });
 // gulp.task("hello", () => console.log("hello"));
 
