@@ -48,7 +48,7 @@ var cfg = {
 	bootstrap_js : { src: bowerPath + "/bootstrap-sass/assets/javascripts/bootstrap.js" },
 	angular : { src: bowerPath + "/angular/angular.js" },
 	angular_ui_router : { src: bowerPath + "/angular-ui-router/release/angular-ui-router.js" },
-	angular_resource : { src: bowerPath + "angular-resource/angular-resource.js" },
+	angular_resource : { src: bowerPath + "/angular-resource/angular-resource.js" },
 
 
 	// vendor build locations

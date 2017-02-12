@@ -10,3 +10,8 @@
 //= require spa-demo/app.router
 //= require spa-demo/app.constant
 
+// Added FOOs module
+//= require spa-demo/foos/foos.module
+//= require spa-demo/foos/foos.service
+//= require spa-demo/foos/foos.controller
+//= require spa-demo/foos/foos.directive
