@@ -42,7 +42,7 @@ module CapstoneDemoapp
       allow do
 
         # Allowed sites
-        origins "*"
+        origins /https:\/\/\w+\.github\.io/
 
         resource "/api/*",
             :headers => :any,
