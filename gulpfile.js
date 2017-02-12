@@ -159,11 +159,17 @@ gulp.task("dist:fonts", () => {
 });
 
 // build/copy over HTML resources into dist tree
+// gulp.task("dist:html", () => {
+//     return gulp.src(cfg.html.src).pipe(debug())
+//         .pipe(htmlMin({ collapseWhitespace: true })) // minify HTML
+//         .pipe(gulp.dest(distPath)).pipe(debug());
+// });
 gulp.task("dist:html", () => {
-    return gulp.src(cfg.html.src).pipe(debug())
+    return gulp.src(cfg.html.src, { base: srcPath + "/javascripts"}).pipe(debug())
         .pipe(htmlMin({ collapseWhitespace: true })) // minify HTML
         .pipe(gulp.dest(distPath)).pipe(debug());
 });
+
 
 // build all dist artifact ready for deployments
 gulp.task("dist", sync.sync(["clean:dist", "build", "dist:assets", "dist:fonts", "dist:html"]));
