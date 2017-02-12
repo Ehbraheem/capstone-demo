@@ -1,4 +1,23 @@
 <div>
     <h2>Foos</h2>
     <span>(from spa-demo/foos/foos.html)</span>
+
+    <form>
+        <div class="form-group">
+            <label for="name" class="control-label">Name:</label>
+            <input type="text" class="form-control"
+                   name="name" ng-model="foosVM.foo.name" required>
+        </div>
+        <div class="form-group">
+            <button ng-if="!foosVM.foo.id" class="btn btn-primary btn-lg" ng-click="foosVM.create()">Create Foo</button>
+            <button ng-if="foosVM.foo.id" class="btn btn-primary btn-lg" ng-click="foosVM.update(foosVM.foo)">Update Foo</button>
+            <button ng-if="foosVM.foo.id" class="btn btn-primary btn-lg" ng-click="foosVM.remove()">Delete Foo</button>
+        </div>
+    </form>
+
+    <ul>
+        <li ng-repeat="foo in foosVM.foos | orderBy: 'name'" >
+            <a ng-click="foosVM.edit(foo)">{{foo.name}}</a>
+        </li>
+    </ul>
 </div>

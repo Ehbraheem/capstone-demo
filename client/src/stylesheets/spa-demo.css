@@ -3,3 +3,6 @@
  */
 
 @import "bootstrap";
+
+/*User defined stylesheets*/
+@import "spa-demo/layout";
