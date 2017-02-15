@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 require 'mongo'
-Mongo::Logger.logger.level = ::Logger::INFO
+Mongo::Logger.logger.level = ::Logger::DEBUG
 
 describe Bar, :type => :model, :orm => :mongoid do
 
-  before(:each) { Bar.delete_all }
+  include_context 'db_cleanup'
 
   context Bar do
     it { is_expected.to have_field(:name).of_type(String).with_default_value_of(nil) }
@@ -13,8 +13,11 @@ describe Bar, :type => :model, :orm => :mongoid do
 
   context "created Bar (let)" do
 
+    include_context 'db_scope'
+
     let(:bar) { Bar.create(:name=> "test") }
-    after(:each) { bar.delete }
+
+
 
     it { expect(bar).to be_persisted }
 
