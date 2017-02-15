@@ -21,6 +21,7 @@ module CapstoneDemoapp
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
 
+    Rails.logger = Logger.new(STDOUT)
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     # config.time_zone = 'Central Time (US & Canada)'
@@ -35,6 +36,21 @@ module CapstoneDemoapp
     # add orm Mongoid or ActiveRecord
     config.generators { |g| g.orm = :active_record}
     # config.generators { |g| g.orm = :mongoid}
+
+    # setting default test generation for rails g
+    config.generators do |g|
+      g.test_framework :rspec,
+          :model_specs => true,
+          :routing_specs => false,
+          :controller_specs => false,
+          :helper_specs => false,
+          :view_specs => false,
+          :request_specs => true,
+          :policy_specs => false,
+          :feature_specs => true
+    end
+
+
 
     # CORS middleware configuration
     config.middleware.insert_before 0, "Rack::Cors" do
