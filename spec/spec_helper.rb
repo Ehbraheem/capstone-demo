@@ -24,12 +24,18 @@ require 'mongoid-rspec'
 
 # Add DBCleaner
 require_relative 'support/database_cleaner.rb'
+# Helper methods for API specs
+require_relative 'support/api_helper.rb'
 
 RSpec.configure do |config|
 
   # bootstrap mongoid matchers for model specs
   # :orm => :mongoid | load mongoid matcher with spec that have metadata orm set to mongoid
   config.include Mongoid::Matchers, :type => :model, :orm => :mongoid
+
+  # bootstrap helper module for request specs
+  config.include ApiHelper, :type => :request
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.

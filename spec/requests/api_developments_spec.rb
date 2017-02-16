@@ -5,9 +5,6 @@ RSpec.describe "ApiDevelopments", type: :request do
   include_context 'db_cleanup_each'
   include_context 'db_scope'
 
-  def parsed_body
-    JSON.parse response.body
-  end
 
   describe "RDBMS-backed" do
 

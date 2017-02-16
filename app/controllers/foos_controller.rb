@@ -1,5 +1,7 @@
 class FoosController < ApplicationController
   before_action :set_foo, only: [:show, :update, :destroy]
+  # help with params passed via HHTP verbs
+  wrap_parameters :foo, include: ["name"]
 
 
   def index

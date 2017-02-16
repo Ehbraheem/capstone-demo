@@ -8,7 +8,7 @@ describe Foo, type: :model do
   # %w( db_cleanup db_scope).each { |action| include_context action}
 
   before(:each) do
-    @foo = Foo.create(:name=> "test")
+    @foo = FactoryGirl.create(:foo, :name => "test")
   end
   let(:foo) { Foo.find(@foo.id) }
   context "created Foo (let)" do

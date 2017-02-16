@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 require 'mongo'
-Mongo::Logger.logger.level = ::Logger::DEBUG
+# Mongo::Logger.logger.level = ::Logger::DEBUG
 
 describe Bar, :type => :model, :orm => :mongoid do
 
@@ -15,9 +15,10 @@ describe Bar, :type => :model, :orm => :mongoid do
 
     include_context 'db_scope'
 
-    let(:bar) { Bar.create(:name=> "test") }
-
-
+    before(:each) do
+      @bar = FactoryGirl.create(:bar, :name => "test")
+    end
+    let(:bar) { Bar.find @bar.id }
 
     it { expect(bar).to be_persisted }
 
