@@ -1,13 +1,15 @@
 require 'rails_helper'
+require 'support/foo_ui_helper'
 
 RSpec.feature "ManageFoos", type: :feature, :js => true do
   include_context "db_cleanup_each"
+  include FooUiHelper
 
   # /html/body/div/div/div/div/form
   # selectors
   # FOO_FORM_CSS = "body > div > div > div > div > form"
-  FOO_FORM_XPATH = "//h3[text()='Foos']/../form"
-  FOO_LIST_XPATH = "//h3[text()='Foos']/../ul"
+  FOO_FORM_XPATH = FooUiHelper::FOO_FORM_XPATH
+  FOO_LIST_XPATH = FooUiHelper::FOO_LIST_XPATH
 
   feature "view existing Foos" do
 
@@ -37,7 +39,7 @@ RSpec.feature "ManageFoos", type: :feature, :js => true do
 
   end
 
-  feature "add new Foo" do
+  feature "add new Foo", :wait => 5 do
 
     let(:foo_state) { FactoryGirl.attributes_for(:foo) }
 
@@ -60,8 +62,18 @@ RSpec.feature "ManageFoos", type: :feature, :js => true do
         click_button("Create Foo")
       end
       within(:xpath, FOO_LIST_XPATH)do
+        using_wait_time 5 do
+          expect(page).to have_css("li", count:1)
+          expect(page).to have_content(foo_state[:name])
+        end
+      end
+    end
+
+    scenario "complete form with helper" do
+      create_foo foo_state
+
+      within(:xpath, FOO_LIST_XPATH)do
         expect(page).to have_css("li", count:1)
-        expect(page).to have_content(foo_state[:name])
       end
     end
 
@@ -71,16 +83,43 @@ RSpec.feature "ManageFoos", type: :feature, :js => true do
       find(:xpath, "//input[contains(@ng-model,'foo.name')]").set(foo_state[:name])
       find(:xpath, "//button[contains(@ng-click,'create()')]").click
       within(:xpath, FOO_LIST_XPATH) do
-        expect(page).to have_xpath("//li", count:1)
-        # expect(page).to have_xpath("//*[text()='#{foo_state[:name]}']")
-        expect(page).to have_content(foo_state[:name])
+        using_wait_time 5 do
+          expect(page).to have_xpath("//li", count:1)
+          # expect(page).to have_xpath("//*[text()='#{foo_state[:name]}']")
+          expect(page).to have_content(foo_state[:name])
+        end
       end
     end
   end
 
   feature "with existing Foo" do
-    scenario "can be updated"
-    scenario "can be deleted"
+
+    let(:foo_state) { FactoryGirl.attributes_for(:foo) }
+    let(:new_name) { FactoryGirl.attributes_for(:foo)[:name] }
+
+    background(:each) do
+      create_foo foo_state
+      expect(page).to have_css("h3", text:"Foos") # on the Foos page
+      expect(page).to have_css("li", count:1)     # one record exist
+      expect(page).to have_css("li", text:foo_state[:name]) # verify the record loaded
+      within(:xpath, FOO_LIST_XPATH) do
+        find(:xpath, "//a[contains(@ng-click, edit)]").click
+      end
+      within(:xpath, FOO_FORM_XPATH) do
+        expect(page).to have_css("input[ng-model*='foo.name']")
+        expect(page).to have_content("Update Foo")
+        expect(page).to have_content("Delete Foo")
+      end
+    end
+
+    scenario "can be updated" do
+      update_foo foo_state[:name], new_name
+    end
+
+    scenario "can be deleted" do
+      delete_foo foo_state[:name]
+      expect(page).to have_no_css("li")
+    end
   end
 
 end

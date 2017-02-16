@@ -17,6 +17,7 @@ class FoosController < ApplicationController
 
 
   def create
+    sleep 2.5
     @foo = Foo.new(foo_params)
 
     if @foo.save
