@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+# TODO: DRY-out spec
+
 RSpec.describe "Foo API", type: :request do
 
   include_context "db_cleanup_each", :transaction

@@ -22,10 +22,55 @@
 # Add the mongoid matchers
 require 'mongoid-rspec'
 
+# test framework for browser simulation
+require 'capybara/rspec'
+
+
 # Add DBCleaner
 require_relative 'support/database_cleaner.rb'
 # Helper methods for API specs
 require_relative 'support/api_helper.rb'
+
+
+
+
+# select browser.
+# browser = :chrome
+browser= :firefox
+Capybara.register_driver :selenium do |app|
+  if browser == :chrome
+    if ENV['CHROMEDRIVER_BINARY_PATH']
+      require 'selenium-webdriver'
+      # set CHROMEDRIVER_BINARY_PATH= "C:\Program Files\chromedriver_win32\chromedriver.exe"
+      Selenium::WebDriver::Chrome.driver_path=ENV['CHROMEDRIVER_BINARY_PATH']
+    end
+    Capybara::Selenium::Driver.new(app, :browser => :chrome)
+  else
+    # Selenium webdriver path error in windows for firefox
+    if ENV['FIREFOX_BINARY_PATH']
+      require 'selenium-webdriver'
+      #set FIREFOX_BINARY_PATH=c:\Program Files\Mozilla Firefox\firefox.exe
+      Selenium::WebDriver::Firefox::Binary.path=ENV['FIREFOX_BINARY_PATH']
+    end
+    Capybara::Selenium::Driver.new(app, :browser => :firefox)
+  end
+end
+
+require 'capybara/poltergeist'
+# Set the default driver
+Capybara.configure do |config|
+  config.default_driver = :rack_test
+  # when we have :js => true
+  config.javascript_driver = :poltergeist
+end
+
+#
+Capybara.register_driver :poltergeist do |app|
+  Capybara::Poltergeist::Driver.new(app,
+  phantomjs_logger: StringIO.new,
+  # logger: STDERR
+  )
+end
 
 RSpec.configure do |config|
 
