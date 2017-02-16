@@ -16,7 +16,7 @@
 # The `.rspec` file also contains a few flags that are not defaults but that
 # users commonly want.
 #
-# See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
 
 
 # Add the mongoid matchers
@@ -72,6 +72,17 @@ Capybara.register_driver :poltergeist do |app|
   )
 end
 
+if ENV["COVERAGE"]
+  require 'simplecov'
+  SimpleCov.start do
+    add_filter "/spec"
+    add_filter "/config"
+    add_group "foos", ["foo"]
+    add_group "bars", ["bar"]
+  end
+end
+
+# See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
 
   # bootstrap mongoid matchers for model specs
