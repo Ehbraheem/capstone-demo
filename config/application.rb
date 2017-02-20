@@ -61,8 +61,9 @@ module CapstoneDemoapp
         # Allowed sites
         origins /https:\/\/\w+\.github\.io/
 
-        resource "/api/*",
+        resource "*",
             :headers => :any,
+            :expose => %w(access-token expiry token-type uid client),
             :methods => [:get, :post, :put, :delete, :options]
       end
     end
