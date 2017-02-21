@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
 
-  resources :images, except: [:new, :edit]
+
   get 'authn/whoami'
 
   get 'authn/checkme'
@@ -9,7 +9,8 @@ Rails.application.routes.draw do
 
   scope :api, defaults: { format: :json}  do
     resources :foos, except: [:new, :edit]
-    resources :bars, except: [:new, :edit] 
+    resources :bars, except: [:new, :edit]
+    resources :images, except: [:new, :edit]
   end
 
   get "/client-assets/:name.:format", :to => redirect("/client/client-assets/%{name}.%{format}")

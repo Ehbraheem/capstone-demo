@@ -46,7 +46,7 @@ RSpec.describe "Bar API", type: :request do
   context "existing Bar" do
     it_should_behave_like "existing resource", :bar do
       let(:response_check) do
-        expect(Bar.find(resource.id).name).to eq(new_name)
+        expect(Bar.find(resource.id).name).to eq(new_name[:name])
       end
     end
   end

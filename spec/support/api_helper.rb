@@ -39,7 +39,7 @@ module ApiHelper
   def logout status=:ok
     jdelete destroy_user_session_path
     @last_tokens = {}
-    expect(response).to have_http_status status
+    expect(response).to have_http_status status if status
   end
 
   def access_tokens?
@@ -63,7 +63,7 @@ RSpec.shared_examples "resource index" do |model|
   let(:payload) { parsed_body }
 
   it "returns all #{model.to_s.classify} instances" do
-    get send("#{model}s_path"), {}, { "Accept" => "application/json"}
+    jget send("#{model}s_path"), {}, { "Accept" => "application/json"}
     expect(response).to have_http_status :ok
     expect(response.content_type).to eq "application/json"
 
@@ -79,7 +79,7 @@ RSpec.shared_examples "show resource" do |model|
   let(:bad_id) { 1234567890 }
 
   it "returns #{model.to_s.classify} when using correct ID" do
-    get send("#{model}_path",(resource.id))
+    jget send("#{model}_path",(resource.id))
     expect(response).to have_http_status :ok
     expect(response.content_type).to eq "application/json"
 
@@ -87,7 +87,7 @@ RSpec.shared_examples "show resource" do |model|
   end
 
   it "returns not found when using incorrect ID" do
-    get send("#{model}_path", bad_id)
+    jget send("#{model}_path", bad_id)
     expect(response).to have_http_status(:not_found)
     expect(response.content_type).to eq("application/json")
     error_state if respond_to?(:error_state)
@@ -107,12 +107,12 @@ end
 
 RSpec.shared_examples "existing resource" do |model|
   let(:resource) { FactoryGirl.create(model) }
-  let(:new_name) { "testing" }
+  let(:new_name) { FactoryGirl.attributes_for(model) }
 
   it "can update name" do
     # verify name is not yet the new name
-    expect(resource.name).to_not eq(new_name)
-    jput send("#{model}_path",resource.id), {:name => new_name}
+    # expect(resource.name).to_not eq(new_name)
+    jput send("#{model}_path",resource.id), new_name
 
     expect(response).to have_http_status :no_content
 
@@ -121,13 +121,13 @@ RSpec.shared_examples "existing resource" do |model|
   end
 
   it "can be deleted" do
-    head send("#{model}_path",resource.id)
+    jhead send("#{model}_path",resource.id)
     expect(response).to have_http_status :ok
 
-    delete send("#{model}_path",resource.id)
+    jdelete send("#{model}_path",resource.id)
     expect(response).to have_http_status :no_content
 
-    head send("#{model}_path",resource.id)
+    jhead send("#{model}_path",resource.id)
     expect(response).to have_http_status :not_found
   end
 end
