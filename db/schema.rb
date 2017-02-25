@@ -52,6 +52,8 @@ ActiveRecord::Schema.define(version: 20170223224347) do
     t.datetime "updated_at",  null: false
   end
 
+  add_index "things", ["name"], name: "index_things_on_name", using: :btree
+
   create_table "users", force: :cascade do |t|
     t.string   "provider",               default: "email", null: false
     t.string   "uid",                    default: "",      null: false
