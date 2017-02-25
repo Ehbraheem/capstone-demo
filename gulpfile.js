@@ -49,6 +49,8 @@ var cfg = {
 	angular : { src: bowerPath + "/angular/angular.js" },
 	angular_ui_router : { src: bowerPath + "/angular-ui-router/release/angular-ui-router.js" },
 	angular_resource : { src: bowerPath + "/angular-resource/angular-resource.js" },
+	angular_cookie : { src: bowerPath + "/angular-cookie/angular-cookie.js" },
+	ng_token_auth : { src: bowerPath + "/ng-token-auth/dist/ng-token-auth.js" },
 
 
 	// vendor build locations
@@ -95,7 +97,9 @@ gulp.task("vendor_js", () => {
 		cfg.bootstrap_js.src,
 		cfg.angular.src,
 		cfg.angular_ui_router.src,
-		cfg.angular_resource.src])
+		cfg.angular_resource.src,
+		cfg.angular_cookie.src,
+		cfg.ng_token_auth.src])
 		.pipe(gulp.dest(cfg.vendor_js.bld));
 });
 gulp.task("vendor_fonts", () => {
