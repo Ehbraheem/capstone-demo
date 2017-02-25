@@ -1,13 +1,11 @@
-/**
- * Created by prof.BOLA on 2/11/2017.
- */
+(function () {
 
-(function (){
-    "use strict";
+    'use strict';
 
     angular
-        .module("spa-demo")
-        .constant("spa-demo.APP_CONFIG", {
+        .module('spa-demo.config', [
+        ])
+        .constant("spa-demo.config.APP_CONFIG", {
             server_url : "http://localhost:3000",
             main_page_html : "spa-demo/pages/main.html",
             foos_html : "spa-demo/foos/foos.html"

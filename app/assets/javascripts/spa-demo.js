@@ -4,14 +4,22 @@
 //= require angular
 //= require angular-ui-router
 //= require angular-resource
+//= require angular-cookie
+//= require ng-token-auth
 
-// Added our files to the manifest for AP load
+// Add our files to the manifest for AP load
 //= require spa-demo/app.module
 //= require spa-demo/app.router
-//= require spa-demo/app.constant
 
-// Added FOOs module
+// App configuration module
+//= require spa-demo/config/config.module
+
+// Add FOOs module
 //= require spa-demo/foos/foos.module
 //= require spa-demo/foos/foos.service
 //= require spa-demo/foos/foos.controller
 //= require spa-demo/foos/foos.directive
+
+// Add AUTHN module
+//= require spa-demo/authn/authn.module
+//= require spa-demo/authn/authn.config
