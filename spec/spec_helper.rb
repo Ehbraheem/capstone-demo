@@ -30,6 +30,8 @@ require 'capybara/rspec'
 require_relative 'support/database_cleaner.rb'
 # Helper methods for API specs
 require_relative 'support/api_helper.rb'
+# Helper methods for UI feature specs
+require_relative 'support/ui_helper.rb'
 
 
 
@@ -61,6 +63,7 @@ require 'capybara/poltergeist'
 Capybara.configure do |config|
   config.default_driver = :rack_test
   # when we have :js => true
+  #TODO: uncomment this line
   config.javascript_driver = :poltergeist
 end
 
@@ -91,6 +94,9 @@ RSpec.configure do |config|
 
   # bootstrap helper module for request specs
   config.include ApiHelper, :type => :request
+
+  # bootstraps helper module for feature specs
+  config.include UiHelper, :type => :feature
 
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest

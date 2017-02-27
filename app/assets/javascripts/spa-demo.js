@@ -23,3 +23,5 @@
 // Add AUTHN module
 //= require spa-demo/authn/authn.module
 //= require spa-demo/authn/authn.config
+//= require spa-demo/authn/authn.service
+//= require spa-demo/authn/signup/signup.component

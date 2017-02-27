@@ -15,7 +15,7 @@
         $authProvider.configure({
             apiUrl : APP_CONFIG.server_url,
             // To remove this error "Possibly unhandled rejection: {"reason":"unauthorized","errors":["No credentials"]}"
-            // validateOnpageLoad : false
+            validateOnpageLoad : false
         });
     };
 })();
