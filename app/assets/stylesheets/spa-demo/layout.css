@@ -4,3 +4,7 @@ body {
 form .invalid {
     color: red;
 }
+.fullsize {
+    padding-right: 0%;
+    padding-left: 0%;
+}

@@ -20,8 +20,13 @@
 //= require spa-demo/foos/foos.controller
 //= require spa-demo/foos/foos.directive
 
+// Add LAYOUT module
+//= require spa-demo/layout/layout.module
+//= require spa-demo/layout/navbar/navbar.component
+
 // Add AUTHN module
 //= require spa-demo/authn/authn.module
 //= require spa-demo/authn/authn.config
 //= require spa-demo/authn/authn.service
 //= require spa-demo/authn/signup/signup.component
+//= require spa-demo/authn/authn_session/authn_session.component

@@ -44,11 +44,12 @@ RSpec.feature "Authns", type: :feature, :js => true do
       scenario "displays error messages" do
         bad_props = FactoryGirl.attributes_for(:user,
                                                :email=>user_props[:email],
-                                               :password=>"123")
+                                               :password=>"123456789")
                                                 .merge(:password_confirmation=>"abc")
         signup bad_props, false
 
         # displays error information
+        save_and_open_page
         expect(page).to have_css("#signup-form > span.invalid",
                                   :text=>"Password confirmation doesn't match password")
       end
@@ -83,7 +84,13 @@ RSpec.feature "Authns", type: :feature, :js => true do
 
   feature "anonymous user" do
 
-    scenario "show login form"
+    scenario "show login form" do
+
+      visit root_path
+      click_on("Login")
+      expect(page).to have_no_css("#logout-form")
+      expect(page).to have_css("#login-form")
+    end
 
   end
 

@@ -14,7 +14,7 @@ RSpec.feature "Mainpages", type: :feature, :js => true do
     end
     it "index page has bootstrap styling" do
       save_and_open_page
-      expect(page).to have_css "div.container"
+      expect(page).to have_css "div.container-fluid"
     end
     it "displays the main application page" do
       expect(page).to have_content("Sample App (from spa-demo/pages/main.html)" )

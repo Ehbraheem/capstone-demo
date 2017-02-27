@@ -10,6 +10,7 @@
             "ui.router",
             "spa-demo.config",
             "spa-demo.foos",
-            "spa-demo.authn"
+            "spa-demo.authn",
+            "spa-demo.layout"
         ]);
 })();
