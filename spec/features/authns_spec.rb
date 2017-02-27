@@ -24,17 +24,59 @@ RSpec.feature "Authns", type: :feature, :js => true do
 
     context "rejected registration" do
 
-      scenario "account not created and stays on page"
+      background(:each) do
+        signup user_props
+        expect(page).to have_no_css("#signup-form")
+      end
 
-      scenario "displays error messages"
+      scenario "account not created and stays on page" do
+        dup_user = FactoryGirl.attributes_for(:user, :email=>user_props[:email])
+        signup dup_user, false # should be rejected by server
+
+        # account not created
+        expect(User.where(:email=>user_props[:email], :name=>user_props[:name])).to exist
+        expect(User.where(:email=>dup_user[:email], :name=>dup_user[:name])).to_not exist
+
+        expect(page).to have_css("#signup-form")
+        expect(page).to have_button("Sign Up")
+      end
+
+      scenario "displays error messages" do
+        bad_props = FactoryGirl.attributes_for(:user,
+                                               :email=>user_props[:email],
+                                               :password=>"123")
+                                                .merge(:password_confirmation=>"abc")
+        signup bad_props, false
+
+        # displays error information
+        expect(page).to have_css("#signup-form > span.invalid",
+                                  :text=>"Password confirmation doesn't match password")
+      end
 
     end
 
     context "invalid field" do
 
-      scenario "bad email"
+      after(:each) do
+        within("#signup-form") do
+          expect(page).to have_button("Sign Up", :disabled=>true)
+        end
+      end
 
-      scenario "missing password"
+      scenario "bad email" do
+
+        filling_signup FactoryGirl.attributes_for(:user, :email=>"yadayadayada")
+        expect(page).to have_css("input[name='signup-email'].ng-invalid-email")
+
+      end
+
+      scenario "missing password" do
+
+        filling_signup FactoryGirl.attributes_for(:user, :password=>nil)
+        expect(page).to have_css("input[name='signup-password'].ng-invalid-required")
+        expect(page).to have_css("input[name='signup-password_confirmation'].ng-invalid-required")
+
+      end
 
     end
   end
