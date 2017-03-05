@@ -46,9 +46,7 @@ RSpec.feature "ManageFoos", type: :feature, :js => true do
     background(:each) do
       visit root_path
       expect(page).to have_css("h3", text:"Foos") # on the Foos page
-      within(:xpath, FOO_LIST_XPATH) do
-        expect(page).to have_css("li", count:0)     # nothing listed
-      end
+      expect(page).to have_css("li", count:0)     # nothing listed
     end
 
     scenario "has input form" do
@@ -86,7 +84,7 @@ RSpec.feature "ManageFoos", type: :feature, :js => true do
       find(:xpath, "//button[contains(@ng-click,'create()')]").click
       within(:xpath, FOO_LIST_XPATH) do
         using_wait_time 5 do
-          expect(page).to have_xpath(".//li", count:1)
+          expect(page).to have_xpath("//li", count:1)
           # expect(page).to have_xpath("//*[text()='#{foo_state[:name]}']")
           expect(page).to have_content(foo_state[:name])
         end
@@ -102,11 +100,9 @@ RSpec.feature "ManageFoos", type: :feature, :js => true do
     background(:each) do
       create_foo foo_state
       expect(page).to have_css("h3", text:"Foos") # on the Foos page
-
+      expect(page).to have_css("li", count:1)     # one record exist
+      expect(page).to have_css("li", text:foo_state[:name]) # verify the record loaded
       within(:xpath, FOO_LIST_XPATH) do
-        expect(page).to have_css("li", count:1)     # one record exist
-        expect(page).to have_css("li", text:foo_state[:name]) # verify the record loaded
-
         find(:xpath, "//a[contains(@ng-click, edit)]").click
       end
       within(:xpath, FOO_FORM_XPATH) do

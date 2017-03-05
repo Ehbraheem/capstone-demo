@@ -25,7 +25,10 @@
 
         service.getCurrentUser = getCurrentUser;
 
+        service.login = login;
+
         return;
+
         /////////////////////
         function signup (registration) {
             return $auth.submitRegistration(registration);
@@ -41,6 +44,19 @@
 
         function getCurrentUser () {
             return service.user;
+        }
+        function login(credentials) {
+            console.log("login", credentials.email);
+            var result = $auth.submitLogin({
+                email: credentials["email"],
+                password: credentials["password"]
+            });
+            return result.then(
+                function (response) {
+                    console.log("login complete", response);
+                    service.user = response;
+                }
+            )
         }
     }
 })();
