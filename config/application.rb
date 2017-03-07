@@ -60,7 +60,7 @@ module CapstoneDemoapp
 
         # Allowed sites
         # TODO: Remove localhost from origins
-        origins %w( /https:\/\/\w+\.github\.io/ /localhost.+/ )
+        origins "*" #%w( /https:\/\/\w+\.github\.io/ /.+localhost.+/ )
 
         resource "*",
             :headers => :any,
