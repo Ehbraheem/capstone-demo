@@ -43,5 +43,14 @@
                     vm.dropdown.removeClass("open");
                 })
         }
+
+        function logout () {
+            Authn.logout()
+                .then (
+                    function() {},
+                    function() {}
+                )
+
+        }
     }
 })();

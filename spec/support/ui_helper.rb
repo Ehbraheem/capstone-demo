@@ -25,6 +25,17 @@ module UiHelper
         end
   end
 
+  def logout
+
+    # Logout
+    find("#navbar-loginlabel").click
+    find_button("Logout").click
+    # dropdown goes away
+    expect(page).to have_no_css("#login-form")
+    expect(page).to have_no_css("#logout-form")
+
+  end
+
   def signup registration, success=true
 
     filling_signup registration

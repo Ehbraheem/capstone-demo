@@ -59,6 +59,7 @@ module CapstoneDemoapp
       allow do
 
         # Allowed sites
+        # TODO: Remove localhost from origins
         origins %w( /https:\/\/\w+\.github\.io/ /localhost.+/ )
 
         resource "*",
