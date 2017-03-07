@@ -26,6 +26,7 @@
         vm.login = login;
         vm.getCurrentUser = Authn.getCurrentUser;
         vm.getCurrentUserName = Authn.getCurrentUserName;
+        vm.logout = logout;
 
         vm.$onInit = function () {
             console.log("AuthnSessionController", $scope);
@@ -39,9 +40,22 @@
         function login () {
             console.log("login");
             Authn.login(vm.loginForm)
-                        .then(function (response) {
+                .then(function (response) {
                     vm.dropdown.removeClass("open");
                 })
+        }
+
+        function logout () {
+            Authn.logout()
+                .then (
+                    function() {
+                        vm.dropdown.removeClass("open");
+                    },
+                    function() {
+                        vm.dropdown.removeClass("open");
+                    }
+                )
+
         }
     }
 })();

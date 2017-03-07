@@ -27,9 +27,23 @@
 
         service.login = login;
 
+        service.logout = logout;
+
+        activate();
+
         return;
 
         /////////////////////
+        function activate() {
+            $auth.validateUser().then(
+                function(user) {
+                    service.user = user;
+                    console.log("validated user", user);
+                },
+                function(user) {}
+            )
+        }
+
         function signup (registration) {
             return $auth.submitRegistration(registration);
         };
@@ -57,6 +71,20 @@
                     service.user = response;
                 }
             )
+        }
+        function logout() {
+            return $auth.signOut()
+                .then(
+                    function(response) {
+                        service.user = null;
+                        console.log("Logout complete", response);
+                    },
+                    function(response) {
+                        service.user = null;
+                        console.log("Logout incomplete", response);
+                        alert(response.status + ":" + response.statusText);
+                    }
+                )
         }
     }
 })();
