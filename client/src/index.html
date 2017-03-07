@@ -23,6 +23,8 @@
     <script src="spa-demo/app.router.js"></script>
 
     <script src="spa-demo/config/config.module.js"></script>
+    <script src="spa-demo/layout/layout.module.js"></script>
+    <script src="spa-demo/layout/navbar/navbar.component.js"></script>
 
     <script src="spa-demo/foos/foos.module.js"></script>
     <script src="spa-demo/foos/foos.service.js"></script>
@@ -30,16 +32,22 @@
     <script src="spa-demo/foos/foos.directive.js"></script>
 
     <script src="spa-demo/authn/authn.module.js"></script>
+    <script src="spa-demo/authn/authn.service.js"></script>
     <script src="spa-demo/authn/authn.config.js"></script>
+
+    <script src="spa-demo/authn/signup/signup.component.js"></script>
+    <script src="spa-demo/authn/authn_session/authn_session.component.js"></script>
 
     <!--endbuild-->
 
 </head>
 <body>
-    <div class="container">
-        <h1>Hello</h1>
-        <span>(from client/src/index.html)</span>
 
+    <div class="container-fluid fullsize">
+        <sd-navbar></sd-navbar>
+    </div>
+
+    <div class="container-fluid">
         <div ui-view></div>
     </div>
 

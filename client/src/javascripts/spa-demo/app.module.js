@@ -2,15 +2,16 @@
  * Created by prof.BOLA on 2/11/2017.
  */
 
-(function() {
-
+(function () {
     "use strict";
 
     angular
         .module("spa-demo", [
             "ui.router",
             "spa-demo.config",
+            "spa-demo.layout",
+            "spa-demo.foos",
             "spa-demo.authn",
-            "spa-demo.foos"
+
         ]);
 })();
