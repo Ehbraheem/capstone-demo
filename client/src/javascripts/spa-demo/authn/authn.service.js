@@ -9,9 +9,9 @@
         .module("spa-demo.authn")
         .service("spa-demo.authn.Authn", Authn);
 
-    Authn.$inject = ["$auth"];
+    Authn.$inject = ["$auth", "$q"];
 
-    function Authn ($auth) {
+    function Authn ($auth, $q) {
 
         var service = this;
 
@@ -65,10 +65,22 @@
                 email: credentials["email"],
                 password: credentials["password"]
             });
+            var defered = $q.defer();
+
             return result.then(
                 function (response) {
                     console.log("login complete", response);
                     service.user = response;
+                    defered.resolve(response);
+                },
+                function (response) {
+                    var formatted_errors = {
+                        errors: {
+                            full_messages: response.errors
+                        }
+                    };
+                    console.log("Login failed", response);
+                    defered.reject(formatted_errors);
                 }
             )
         }
