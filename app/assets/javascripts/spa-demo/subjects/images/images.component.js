@@ -45,20 +45,28 @@
     }
 
     imageEditorTemplateUrl.$inject = ["spa-demo.config.APP_CONFIG"];
+
     function imageEditorTemplateUrl(APP_CONFIG) {
         return APP_CONFIG.image_editor_html;
     }
 
     ImageEditorController.$inject = ["$scope",
-        "$stateParams",
-        "spa-demo.subjects.Image"];
+                                    "$stateParams",
+                                    "$state",
+                                    "spa-demo.subjects.Image"];
 
-    function ImageEditorController ($scope, $stateParams, Image) {
+    function ImageEditorController ($scope, $stateParams, $state, Image) {
         var $ctrl = this;
+        $ctrl.create = create;
+        $ctrl.clear = clear;
+        $ctrl.update = update;
+        $ctrl.remove = remove;
 
         $ctrl.$onInit = function () {
             console.log("ImageSelectorController", $scope);
             if ($stateParams.id) {
+                console.log("new Image from $onInit");
+                console.log($ctrl.item);
                 $ctrl.item = Image.get({id: $stateParams.id});
             } else {
                 newResource();
@@ -70,7 +78,58 @@
 
         function newResource() {
             $ctrl.item = new Image();
+            console.log("new Image", $ctrl.item);
             return $ctrl.item;
+        }
+
+        function clear() {
+            newResource();
+            $state.go(".", {id:null})
+        }
+        
+        function create() {
+            $scope.imageForm.$setPristine();
+            $ctrl.item.errors = null;
+            $ctrl.item.$save().then(
+                function() {
+                    $state.go(".", {id:$ctrl.item.id});
+                },
+                handleError
+            );
+        }
+
+        function update() {
+            $scope.imageForm.$setPristine();
+            $ctrl.item.errors = null;
+            $ctrl.item.$update().then(
+                function () {
+                    console.log("update complete", $ctrl.item);
+                    $state.reload();
+                },
+                handleError
+            )
+        }
+
+        function remove() {
+            $ctrl.item.errors = null;
+            $ctrl.item.$delete().then(
+                function () {
+                    console.log("remove complete", $ctrl.item);
+                    clear();
+                },
+                handleError
+            )
+        }
+        
+        function handleError(response) {
+            console.log("error",response);
+            if (response.data) {
+                $ctrl.item["errors"] = response.data.errors;
+            }
+            if (!$ctrl.item.errors) {
+                $ctrl.item["errors"] = {};
+                $ctrl.item["errors"]["full_messages"] = [response];
+            }
         }
     }
 })();

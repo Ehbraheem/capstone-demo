@@ -69,9 +69,9 @@
                 vm.authz.canUpdate     = true;
                 vm.authz.canDelete     = true;
                 vm.authz.canGetDetails = true;
-            } //else {
-            //     vm.resetAccess();
-            // }
+            } else {
+                vm.resetAccess();
+            }
         }
 
        function canUpdateItem (item) {
