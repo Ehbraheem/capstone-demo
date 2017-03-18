@@ -1,0 +1,44 @@
+<form class="image-form row" name="imageForm">
+    <span class="image_id id">{{$ctrl.item.id}}</span>
+    <span class="invalid">{{$ctrl.item.errors.full_messages}}</span>
+
+    <div class="image-caption row row-lg-12">
+        <label for="image-caption" class="col-xs-3">Caption: </label>
+        <input type="text"
+               class="col-xs-9"
+               name="image-caption"
+               ng-model="$ctrl.item.caption"
+               ng-readonly="!$ctrl.authz.canUpdate"
+               maxlength="60"
+               pattern=".{3,}" title="3 character minimum for Caption"
+               id="image-caption"/>
+        <span class="invalid">{{$ctrl.item.errors.name}}</span>
+    </div>
+
+    <div class="image-controls">
+        <span ng-show="$ctrl.authz.authenticated">
+            <button name="image-create"
+                    ng-show="!$ctrl.item.id && $ctrl.authz.canCreate"
+                    type="submit"
+                    ng-disabled="imageForm.$invalid"
+                    ng-click="$ctrl.create()">Create Image</button>
+
+            <span ng-show="$ctrl.item.id">
+                <button name="image-update"
+                        type="submit"
+                        ng-show="$ctrl.authz.canUpdate"
+                        ng-disabled="!imageForm.$dirty"
+                        ng-click="$ctrl.update()">Update Image</button>
+                <button name="image-delete"
+                        type="submit"
+                        ng-show="$ctrl.authz.canDelete"
+                        ng-click="$ctrl.remove()">Delete Image</button>
+            </span>
+        </span>
+
+        <button type="submit"
+                name="image-clear"
+                ng-show="$ctrl.item.id || imageForm.$dirty"
+                ng-click="$ctrl.clear()">Clear Image</button>
+    </div>
+</form>
