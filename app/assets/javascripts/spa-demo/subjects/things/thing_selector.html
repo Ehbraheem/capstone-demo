@@ -1,0 +1,10 @@
+<div class="thing-list">
+    <ul>
+        <li ng-repeat="thing in $ctrl.things | orderBy: 'name'">
+            <a ui-sref="things({id:thing.id})">
+                <span class="thing_id id">{{thing.id}}</span>
+                {{thing.name}}
+            </a>
+        </li>
+    </ul>
+</div>

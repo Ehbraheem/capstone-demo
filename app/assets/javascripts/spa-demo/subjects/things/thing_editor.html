@@ -1,0 +1,68 @@
+<form class="thing-form row" name="thingForm">
+    <span class="thing_id id">{{$ctrl.thing.id}}</span>
+    <span class="invalid">{{$ctrl.thing.errors.full_messages}}</span>
+
+    <div class="thing-name  row row-lg-12">
+        <label for="thing-name" class="col-xs-3">Name: </label>
+        <input type="text"
+               class="col-xs-9"
+               id="thing-name"
+               name="thing-name"
+               ng-model="$ctrl.thing.name"
+               ng-readonly="!$ctrl.authz.canUpdate"
+               maxlength="40"
+               pattern=".{3,}" title="3 character minimum for Name"
+               required />
+        <span class="invalid">{{$ctrl.thing.errors.name}}</span>
+    </div>
+
+    <div class="thing-desc row col-lg-12"
+         ng-show="thingForm.$invalid">
+        <label for="thing-desc" class="col-xs-3">Description:</label>
+        <textarea name="thing-desc"
+                  id="thing-desc"
+                  class="col-xs-9"
+                  maxlength="4000"
+                  ng-model="$ctrl.thing.description"
+                  ng-readonly="!$ctrl.authz.canUpdate"></textarea>
+        <span class="invalid">{{$ctrl.thing.errors.description}}</span>
+    </div>
+
+    <div class="thing-notes row col-lg-12"
+         ng-show="$ctrl.authz.canGetDetails && thingForm.$invalid">
+        <label for="thing-notes"
+               class="col-xs-3">Notes: </label>
+        <textarea name="thing-notes"
+                  id="thing-notes"
+                  class="col-xs-9"
+                  maxlength="4000"
+                  ng-readonly="!$ctrl.canUpdate"
+                  ng-model="$ctrl.thing.notes"></textarea>
+        <span class="invalid">{{$ctrl.errors.notes}}</span>
+    </div>
+
+    <div class="thing-controls">
+        <span ng-show="$ctrl.authz.authenticated">
+            <button ng-show="!$ctrl.thing.id && $ctrl.authz.canCreate"
+                    name="thing-create"
+                    type="submit"
+                    ng-disabled="thingForm.$invalid"
+                    ng-click="$ctrl.create()">Create Thing</button>
+            <div ng-show="$ctrl.thing.id">
+                <span class="thing-modify">
+                    <button type="submit"
+                            name="thing-update"
+                            ng-disabled="thingForm.$invalid || thingForm.$pristine"
+                            ng-click="$ctrl.update()">Update Thing</button>
+                    <button name="thing-delete"
+                            type="submit"
+                            ng-show="$ctrl.authz.canDelete"
+                            ng-click="$ctrl.remove()">Delete Thing</button>
+                    <button name="thing-clear"
+                            type="submit"
+                            ng-click="$ctrl.clear()"></button>
+                </span>
+            </div>
+        </span>
+    </div>
+</form>
