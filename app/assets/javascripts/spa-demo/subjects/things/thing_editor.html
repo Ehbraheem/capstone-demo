@@ -15,6 +15,7 @@
                required />
         <span class="invalid">{{$ctrl.thing.errors.name}}</span>
     </div>
+    <br>
 
     <div class="thing-desc row col-lg-12"
          ng-show="thingForm.$invalid">
@@ -23,11 +24,13 @@
                   id="thing-desc"
                   class="col-xs-9"
                   maxlength="4000"
+                  rows="10" cols="15"
                   ng-model="$ctrl.thing.description"
                   ng-readonly="!$ctrl.authz.canUpdate"></textarea>
         <span class="invalid">{{$ctrl.thing.errors.description}}</span>
     </div>
 
+    <br>
     <div class="thing-notes row col-lg-12"
          ng-show="$ctrl.authz.canGetDetails && thingForm.$invalid">
         <label for="thing-notes"
@@ -36,6 +39,7 @@
                   id="thing-notes"
                   class="col-xs-9"
                   maxlength="4000"
+                  rows="10" cols="15"
                   ng-readonly="!$ctrl.canUpdate"
                   ng-model="$ctrl.thing.notes"></textarea>
         <span class="invalid">{{$ctrl.errors.notes}}</span>
@@ -60,7 +64,7 @@
                             ng-click="$ctrl.remove()">Delete Thing</button>
                     <button name="thing-clear"
                             type="submit"
-                            ng-click="$ctrl.clear()"></button>
+                            ng-click="$ctrl.clear()">Clear Thing</button>
                 </span>
             </div>
         </span>

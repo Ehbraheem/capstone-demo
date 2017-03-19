@@ -43,7 +43,7 @@
             if (!$stateParams.id) {
                 $ctrl.things = Things.query();
             }
-        }
+        };
 
         return;
         //////////////////////////
@@ -77,15 +77,15 @@
 
         function clear() {
             newResource();
-            state.go(".", {id:null});
+            $state.go(".", {id:null});
         }
 
         function create() {
-            $scope.thingForm.$setpristine();
+            $scope.thingForm.$setPristine();
             $ctrl.thing.errors = null;
             $ctrl.thing.$save().then(
                 function () {
-                    $state.go(".", {id: $ctrl.item.id});
+                    $state.go(".", {id: $ctrl.thing.id});
                 },
                 handleError
             )

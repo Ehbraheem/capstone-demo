@@ -1,0 +1,18 @@
+/**
+ * Created by prof.BOLA on 3/19/2017.
+ */
+
+(function () {
+
+    "use strict";
+
+    angular
+        .module("spa-demo.subjects")
+        .factrory("spa-demo.subjects.ImageLinkableThing", ImageLinkableThing);
+
+    ImageLinkableThing.$inject = ["$resource", "spa-demo.config.APP_CONFIG"];
+
+    function ImageLinkableThing ($resource, APP_CONFIG) {
+        return $resource(APP_CONFIG.server_url + "/api/images/:image_id/linkable_things");
+    }
+})();
