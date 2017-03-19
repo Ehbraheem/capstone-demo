@@ -50,12 +50,15 @@
         return APP_CONFIG.image_editor_html;
     }
 
-    ImageEditorController.$inject = ["$scope",
-                                    "$stateParams",
-                                    "$state",
-                                    "spa-demo.subjects.Image"];
+    ImageEditorController.$inject = ["$scope", "$q",
+                                    "$stateParams", "$state",
+                                    "spa-demo.subjects.Image",
+                                    "spa-demo.subjects.ImageThing",
+                                    "spa-demo.subjects.ImageLinkableThing",
+                                    ];
 
-    function ImageEditorController ($scope, $stateParams, $state, Image) {
+    function ImageEditorController ($scope, $q, $stateParams, $state,
+                                    Image, ImageThing, ImageLinkableThing) {
         var $ctrl = this;
         $ctrl.create = create;
         $ctrl.clear = clear;
@@ -65,7 +68,7 @@
         $ctrl.$onInit = function () {
             console.log("ImageSelectorController", $scope);
             if ($stateParams.id) {
-                $ctrl.item = Image.get({id: $stateParams.id});
+                reload($stateParams.id);
             } else {
                 newResource();
             }
@@ -79,13 +82,21 @@
             return $ctrl.item;
         }
 
+        function reload(imageId) {
+            var itemId = imageId ? imageId : vm.item.id;
+            console.log("re/loading image", itemId);
+            $ctrl.things = ImageThing.query({image_id: itemId});
+            $ctrl.item = Image.get({id:itemId});
+            $q.all([$ctrl.item.$promise,
+                $ctrl.things.$promise]).catch(handleError);
+        }
+
         function clear() {
             newResource();
             $state.go(".", {id:null})
         }
         
         function create() {
-            $scope.imageForm.$setPristine();
             $ctrl.item.errors = null;
             $ctrl.item.$save().then(
                 function() {
@@ -101,6 +112,7 @@
             $ctrl.item.$update().then(
                 function () {
                     console.log("update complete", $ctrl.item);
+                    $scope.imageForm.$setPristine();
                     $state.reload();
                 },
                 handleError
@@ -127,6 +139,7 @@
                 $ctrl.item["errors"] = {};
                 $ctrl.item["errors"]["full_messages"] = [response];
             }
+            $scope.imageForm.$setPristine();
         }
     }
 })();

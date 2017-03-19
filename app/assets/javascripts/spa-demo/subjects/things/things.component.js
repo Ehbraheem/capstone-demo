@@ -49,9 +49,12 @@
         //////////////////////////
     }
 
-    ThingsEditorController.$inject = ["$scope", "$state", "$stateParams", "spa-demo.subjects.Things"];
+    ThingsEditorController.$inject = ["$scope", "$q", "$state",
+                                        "$stateParams",
+                                        "spa-demo.subjects.Things",
+                                        "spa-demo.subjects.ThingImage"];
 
-    function ThingsEditorController ($scope, $state, $stateParams, Things) {
+    function ThingsEditorController ($scope, $q, $state, $stateParams, Things, ThingImage) {
         var $ctrl    = this;
         $ctrl.clear  = clear;
         $ctrl.remove = remove;
@@ -61,7 +64,7 @@
         $ctrl.$onInit = function () {
             console.log("ThingsEditorController", $scope);
             if ($stateParams.id) {
-                $ctrl.thing = Things.get({id: $stateParams.id});
+                reload($stateParams.id);
             } else {
                 newResource();
             }
@@ -74,6 +77,20 @@
             $ctrl.thing = new Things();
             return $ctrl.thing;
         };
+
+        function reload(thingId) {
+            var itemId = thingId ? thingId : $ctrl.thing.id;
+            console.clear().log("re/loading thing", itemId);
+            $ctrl.images = ThingImage.query({thing_id: itemId});
+            $ctrl.thing = Things.get({id:itemId});
+            $ctrl.images.$promise.then(
+              function () {
+                  angular.forEach($ctrl.images, function (ti) {
+                      ti.originalPriority = ti.priority;
+                  });
+              });
+            $q.all([$ctrl.thing.$promise, $ctrl.images.$promise]).catch(handleError);
+        }
 
         function clear() {
             newResource();

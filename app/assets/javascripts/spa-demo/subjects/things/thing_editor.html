@@ -15,7 +15,6 @@
                required />
         <span class="invalid">{{$ctrl.thing.errors.name}}</span>
     </div>
-    <br>
 
     <div class="thing-desc row col-lg-12"
          ng-show="thingForm.$invalid">
@@ -24,13 +23,13 @@
                   id="thing-desc"
                   class="col-xs-9"
                   maxlength="4000"
+                  size="80"
                   rows="10" cols="15"
                   ng-model="$ctrl.thing.description"
                   ng-readonly="!$ctrl.authz.canUpdate"></textarea>
         <span class="invalid">{{$ctrl.thing.errors.description}}</span>
     </div>
 
-    <br>
     <div class="thing-notes row col-lg-12"
          ng-show="$ctrl.authz.canGetDetails && thingForm.$invalid">
         <label for="thing-notes"
@@ -39,10 +38,44 @@
                   id="thing-notes"
                   class="col-xs-9"
                   maxlength="4000"
+                  size="80"
                   rows="10" cols="15"
                   ng-readonly="!$ctrl.canUpdate"
                   ng-model="$ctrl.thing.notes"></textarea>
         <span class="invalid">{{$ctrl.errors.notes}}</span>
+    </div>
+
+    <div class="thing-images row col-lg-12">
+        <label for="" class="col-xs-3">Related Images: </label>
+        <ul class="thing-images col-xs 9">
+            <li ng-repeat="ti in $ctrl.images | orderBy:'priority'">
+                <input type="checkbox"
+                       name="image-delete"
+                       ng-model="ti.toRemove"
+                       ng-show="$ctrl.authz.canRemoveImage"
+                       value="{{ti.id}}">
+                <div class="image-delete glyphicon glyphicon-remove"
+                     ng-show="ti.toRemove"></div>
+                <input type="number"
+                       name="image-priority"
+                       min="0"
+                       max="9"
+                       ng-show="$ctrl.authz.canUpdateImage && !ti.toRemove"
+                       ng-model="ti.priority">
+                <div class="glyphicon glyphicon-asterisk"
+                     ng-hide="ti.originalPriority == ti.priority || ti.toRemove"></div>
+                <a ui-sref="images({id:ti.image_id})">
+                    <img style="width: 50px;"
+                         alt="ti.image_name" ng-src="{{ti.image_content_url}}?width=50" />
+                    <span class="id image_id">{{ti.image_id}}</span>
+                    <label class="image-caption"
+                           ng-show="ti.image_caption">{{ti.image_caption}}</label>
+                    <label class="image-caption"
+                           ng-hide="ti.image_caption">(no caption {{ti.image_id}}</label>
+                </a>
+            </li>
+        </ul>
+        <span class="invalid">{{$ctrl.item.errors.images}}</span>
     </div>
 
     <div class="thing-controls">
@@ -56,7 +89,7 @@
                 <span class="thing-modify">
                     <button type="submit"
                             name="thing-update"
-                            ng-disabled="thingForm.$invalid || thingForm.$pristine"
+                            ng-disabled="thingForm.$invalid || thingForm.$dirty"
                             ng-click="$ctrl.update()">Update Thing</button>
                     <button name="thing-delete"
                             type="submit"
