@@ -80,7 +80,7 @@
 
         function reload(thingId) {
             var itemId = thingId ? thingId : $ctrl.thing.id;
-            console.clear().log("re/loading thing", itemId);
+            console.log("re/loading thing", itemId);
             $ctrl.images = ThingImage.query({thing_id: itemId});
             $ctrl.thing = Things.get({id:itemId});
             $ctrl.images.$promise.then(
@@ -98,7 +98,6 @@
         }
 
         function create() {
-            $scope.thingForm.$setPristine();
             $ctrl.thing.errors = null;
             $ctrl.thing.$save().then(
                 function () {
@@ -111,6 +110,7 @@
         function update() {
             $ctrl.thing.$update().then(
                 function () {
+                    $scope.thingForm.$setPristine();
                     $state.reload();
                 },
                 handleError
@@ -134,6 +134,7 @@
                 $ctrl.thing.errors = {};
                 $ctrl.thing.errors = [response];
             }
+            $scope.thingForm.$setPristine();
         }
 
     }

@@ -17,7 +17,7 @@
     </div>
 
     <div class="thing-desc row col-lg-12"
-         ng-show="thingForm.$invalid">
+         ng-show="thingForm.$valid">
         <label for="thing-desc" class="col-xs-3">Description:</label>
         <textarea name="thing-desc"
                   id="thing-desc"
@@ -31,7 +31,7 @@
     </div>
 
     <div class="thing-notes row col-lg-12"
-         ng-show="$ctrl.authz.canGetDetails && thingForm.$invalid">
+         ng-show="$ctrl.authz.canGetDetails && thingForm.$valid">
         <label for="thing-notes"
                class="col-xs-3">Notes: </label>
         <textarea name="thing-notes"
@@ -40,7 +40,7 @@
                   maxlength="4000"
                   size="80"
                   rows="10" cols="15"
-                  ng-readonly="!$ctrl.canUpdate"
+                  ng-readonly="!$ctrl.authz.canUpdate"
                   ng-model="$ctrl.thing.notes"></textarea>
         <span class="invalid">{{$ctrl.errors.notes}}</span>
     </div>

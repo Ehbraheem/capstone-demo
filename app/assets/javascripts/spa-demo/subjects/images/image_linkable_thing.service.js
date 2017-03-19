@@ -8,7 +8,7 @@
 
     angular
         .module("spa-demo.subjects")
-        .factrory("spa-demo.subjects.ImageLinkableThing", ImageLinkableThing);
+        .factory("spa-demo.subjects.ImageLinkableThing", ImageLinkableThing);
 
     ImageLinkableThing.$inject = ["$resource", "spa-demo.config.APP_CONFIG"];
 

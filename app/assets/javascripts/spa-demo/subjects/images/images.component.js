@@ -83,10 +83,11 @@
         }
 
         function reload(imageId) {
-            var itemId = imageId ? imageId : vm.item.id;
+            var itemId = imageId ? imageId : $ctrl.item.id;
             console.log("re/loading image", itemId);
-            $ctrl.things = ImageThing.query({image_id: itemId});
             $ctrl.item = Image.get({id:itemId});
+            $ctrl.things = ImageThing.query({image_id: itemId});
+            $ctrl.linkable_things = ImageLinkableThing.query({image_id:itemId});
             $q.all([$ctrl.item.$promise,
                 $ctrl.things.$promise]).catch(handleError);
         }
@@ -107,13 +108,27 @@
         }
 
         function update() {
-            $scope.imageForm.$setPristine();
             $ctrl.item.errors = null;
-            $ctrl.item.$update().then(
-                function () {
-                    console.log("update complete", $ctrl.item);
+            var update = $ctrl.item.$update();
+            linkThings(update);
+        }
+        
+        function linkThings(parentPromise) {
+            var promises = []
+            if (parentPromise) { promises.push(parentPromise); }
+            angular.forEach($ctrl.selected_linkables, function (linkable) {
+                var resource = ImageThing.save({image_id:$ctrl.item.id}, {thing_id: linkable});
+                promises.push(resource.$promise);
+            });
+
+            $ctrl.selected_linkables = [];
+            console.log("waiting for promises", promises);
+            $q.all(promises).then(
+                function (response) {
+                    console.log("promise.all response", response);
+                    console.log("$scope ", $scope);
                     $scope.imageForm.$setPristine();
-                    $state.reload();
+                    reload();
                 },
                 handleError
             )
