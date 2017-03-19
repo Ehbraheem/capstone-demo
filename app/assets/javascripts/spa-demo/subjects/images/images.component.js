@@ -65,8 +65,6 @@
         $ctrl.$onInit = function () {
             console.log("ImageSelectorController", $scope);
             if ($stateParams.id) {
-                console.log("new Image from $onInit");
-                console.log($ctrl.item);
                 $ctrl.item = Image.get({id: $stateParams.id});
             } else {
                 newResource();
@@ -78,7 +76,6 @@
 
         function newResource() {
             $ctrl.item = new Image();
-            console.log("new Image", $ctrl.item);
             return $ctrl.item;
         }
 
