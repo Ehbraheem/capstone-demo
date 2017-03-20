@@ -68,7 +68,15 @@
         $ctrl.$onInit = function () {
             console.log("ImageSelectorController", $scope);
             if ($stateParams.id) {
-                reload($stateParams.id);
+                // reload($stateParams.id);
+                $scope.$watch(
+                    function () {
+                        return $ctrl.authz.authenticated;
+                    },
+                    function () {
+                        reload($stateParams.id);
+                    }
+                );
             } else {
                 newResource();
             }

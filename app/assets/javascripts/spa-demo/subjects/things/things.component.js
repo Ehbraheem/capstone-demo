@@ -55,16 +55,25 @@
                                         "spa-demo.subjects.ThingImage"];
 
     function ThingsEditorController ($scope, $q, $state, $stateParams, Things, ThingImage) {
-        var $ctrl    = this;
-        $ctrl.clear  = clear;
-        $ctrl.remove = remove;
-        $ctrl.update = update;
-        $ctrl.create = create;
+        var $ctrl            = this;
+        $ctrl.clear          = clear;
+        $ctrl.remove         = remove;
+        $ctrl.update         = update;
+        $ctrl.create         = create;
+        $ctrl.haveDirtyLinks = haveDirtyLinks;
 
         $ctrl.$onInit = function () {
             console.log("ThingsEditorController", $scope);
             if ($stateParams.id) {
-                reload($stateParams.id);
+                // reload($stateParams.id);
+                $scope.$watch(
+                    function () {
+                        return $ctrl.authz.authenticated;
+                    },
+                    function () {
+                        reload($stateParams.id);
+                    }
+                )
             } else {
                 newResource();
             }
@@ -92,6 +101,23 @@
             $q.all([$ctrl.thing.$promise, $ctrl.images.$promise]).catch(handleError);
         }
 
+        function haveDirtyLinks() {
+            for (var i = 0; $ctrl.images && i < $ctrl.images.length; i++) {
+                var ti = $ctrl.images[i];
+                if (ti.toRemove || ti.originalPriority != ti.priority) {
+                    return true;
+                }
+            }
+            return false;
+            // angular.forEach($ctrl.images,function (ti) {
+            //     if (ti.toRemove || ti.originalPriority != ti.priority) {
+            //         // console.log("To Remove")
+            //         return true;
+            //     };
+            // })
+            // return false;
+        }
+
         function clear() {
             newResource();
             $state.go(".", {id:null});
@@ -108,10 +134,28 @@
         }
 
         function update() {
-            $ctrl.thing.$update().then(
-                function () {
+            $ctrl.thing.errors = null;
+            var promises = $ctrl.thing.$update();
+            updateImageLinks(promises);
+        }
+
+        function updateImageLinks(promise) {
+            var promises = [];
+            if (promise) { promises.push(promise) }
+            angular.forEach($ctrl.images, function (ti) {
+                if (ti.toRemove) {
+                    promises.push(ti.$remove());
+                } else if (ti.originalPriority != ti.priority) {
+                    promises.push(ti.$update());
+                }
+            });
+
+            console.log("waiting for promises", promises);
+            $q.all(promises).then(
+                function (reponse) {
+                    console.log("promise.all response", response);
                     $scope.thingForm.$setPristine();
-                    $state.reload();
+                    reload();
                 },
                 handleError
             )

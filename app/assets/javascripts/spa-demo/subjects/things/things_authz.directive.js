@@ -35,20 +35,16 @@
     function ThingsAuthzController ($scope, Authn) {
         var vm                   = this;
         vm.authz                 = {};
-        vm.authz.authenticated   = false;
-        vm.authz.canDelete       = false;
-        vm.authz.canUpdate       = false;
-        vm.authz.canGetDetails   = false;
         vm.authz.canUpdateItem   = canUpdateItem;
-        vm.authz.canQuery        = false;
-        vm.authz.canCreate       = false;
 
         ThingsAuthzController.prototype.resetAccess = function () {
-            this.authz.canQuery      = false;
-            this.authz.canCreate     = false;
-            this.authz.canUpdate     = false;
-            this.authz.canDelete     = false;
-            this.authz.canGetDetails = false;
+            this.authz.canQuery       = false;
+            this.authz.canCreate      = false;
+            this.authz.canUpdate      = false;
+            this.authz.canDelete      = false;
+            this.authz.canGetDetails  = false;
+            this.authz.canUpdateImage = false;
+            this.authz.canRemoveImage = false;
         }
 
         activate();
@@ -65,10 +61,12 @@
             vm.authz.canQuery = true;
             vm.authz.authenticated = Authn.isAuthenticated();
             if (vm.authz.authenticated) {
-                vm.authz.canCreate     = true;
-                vm.authz.canUpdate     = true;
-                vm.authz.canDelete     = true;
-                vm.authz.canGetDetails = true;
+                vm.authz.canCreate       = true;
+                vm.authz.canUpdate       = true;
+                vm.authz.canDelete       = true;
+                vm.authz.canGetDetails   = true;
+                vm.authz.canUpdateImage  = true;
+                vm.authz.canRemoveImage  = true;
             } else {
                 vm.resetAccess();
             }
