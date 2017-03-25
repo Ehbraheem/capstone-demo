@@ -132,7 +132,14 @@ RSpec.feature "Authns", type: :feature, :js => true do
         end
       end
 
-      scenario "can access authenticated resources"
+      scenario "can access authenticated resources" do
+
+        checkme
+        within("div.checkme-user") do
+          expect(page).to have_css("label", :text=>/#{user_props[:name]}/)
+          expect(page).to have_css("label", :text=>/#{user_props[:email]}/)
+        end
+      end
 
     end
 
@@ -185,7 +192,16 @@ RSpec.feature "Authns", type: :feature, :js => true do
 
     end
 
-    scenario "can no longer access authenticated resources"
+    scenario "can no longer access authenticated resources" do
+
+      logout
+      checkme
+
+      within("div.checkme-user") do
+        expect(page).to have_no_css("label", :text=>/#{user_props[:name]}/)
+        expect(page).to have_css("label", :text=>/Authorised users only/)
+      end
+    end
 
   end
 

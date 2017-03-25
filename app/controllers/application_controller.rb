@@ -5,6 +5,9 @@ class ApplicationController < ActionController::API
   # make the connection between controller action and associated view
   include ActionController::ImplicitRender
 
+  # Authorization gem
+  include Pundit
+
   # hook in the devise whitelisting params[] method
   before_action :configure_permitted_parameters, if: :devise_controller?
 
@@ -14,6 +17,9 @@ class ApplicationController < ActionController::API
 
   # intercept ActionController::ParameterMissing exception
   rescue_from ActionController::ParameterMissing, with: :params_missing
+
+  # Pundit authorization error callback
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   protected
     def full_message_error full_message, status
@@ -39,5 +45,14 @@ class ApplicationController < ActionController::API
       }
       render json: payload, status: :bad_request
       Rails.logger.debug exception.message
+    end
+
+    def user_not_authorized exception
+      user = pundit_user ? pundit_user.uid : "Annonymous user"
+      payload = {
+          errors: {full_message: ["#{user} not authorized to #{exception.query}"]}
+      }
+      render :json => payload, :status => :forbidden
+      Rails.logger.debug exception
     end
 end

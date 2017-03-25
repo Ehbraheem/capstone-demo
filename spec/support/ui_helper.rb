@@ -48,4 +48,12 @@ module UiHelper
     end
 
   end
+
+  def checkme
+    visit root_path + "#/authn"
+    within("div#authn-check") do
+      click_button("CheckMe() says...")
+    end
+  end
+
 end

@@ -4,10 +4,17 @@ class ImagePolicy < ApplicationPolicy
 		@user
 	end
 
+  def index?
+    true
+  end
 
   class Scope < Scope
     def resolve
-      scope
+      if @user
+        scope
+      else
+        scope.where("1!=1")
+      end
     end
   end
 end
