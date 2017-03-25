@@ -1,6 +1,6 @@
 span#user_id {
-	display: none;
-}
+     display: none;
+ }
 
 #login-form #new-account label {
     width: auto; /* flatten the "New here?" label */
