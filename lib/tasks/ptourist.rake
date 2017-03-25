@@ -10,8 +10,8 @@ namespace :ptourist do
     "#{first_name}@bbunch.org"
   end
 
-  def user first_name
-    User.find_by(:email=> user.email(first_name))
+  def user(first_name)
+    User.find_by(:email=> user_email(first_name))
   end
 
   def create_image organizer, img
@@ -69,7 +69,7 @@ namespace :ptourist do
     :description => "Group friendly located just a few miles north of Baltimore's
  Inner Harbor. Great neighborhood in Baltimore County",
     :notes => "Early to bed, early to rise"}
-    organizer = user "alice"
+    organizer = user 'alice'
     images = [
         {:path => "db/bta/hitim-001.jpg",
         :caption => "Hotel Front Entrance",
