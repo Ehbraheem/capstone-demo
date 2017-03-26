@@ -9,7 +9,9 @@ class ImagesController < ApplicationController
   # GET /images.json
   def index
     authorize Image
-    @images = policy_scope Image.all
+    @images = policy_scope(Image.all)
+    @images = ImagePolicy.merge(@images)
+    pp @images.map {|r| r.attributes}
     #
     # render json: @images
   end
@@ -19,6 +21,8 @@ class ImagesController < ApplicationController
   def show
     # render json: @image
     authorize @image
+    images = policy_scope(Image.where(:id=>@image.id))
+    @image = ImagePolicy.merge(images).first
   end
 
   # POST /images
@@ -32,6 +36,7 @@ class ImagesController < ApplicationController
     User.transaction do
       if @image.save
         role = current_user.add_role(Role::ORGANIZER, @image)
+        @image.user_roles << role.role_name
         role.save
         render :show, status: :created, location: @image
       else

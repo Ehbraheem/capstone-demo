@@ -21,12 +21,15 @@ class ImagePolicy < ApplicationPolicy
   end
 
   class Scope < Scope
+    def user_roles
+      join_clause = ["left join Roles r on r.mname='Image'",
+                    "r.mid=Images.id",
+                     "r.user_id #{user_criteria}"].join(" and ")
+      scope.select("Images.*, r.role_name")
+            .joins(join_clause)
+    end
     def resolve
-      if @user
-        scope
-      else
-        scope.where("1!=1")
-      end
+      user_roles
     end
   end
 end
