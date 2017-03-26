@@ -20,4 +20,20 @@ RSpec.describe Role, type: :model do
       expect(db_user.has_role([Role::MEMBER], "Baz", 1)).to be true
     end
   end
+
+  context "ad min factory" do
+    let(:admin) { FactoryGirl.build(:admin) }
+    let(:db_admin) { FactoryGirl.create(:admin) }
+
+    it "builds admin" do
+      expect(admin.id).to be_nil
+      admin_role = admin.roles.select {|r| r.role_name==Role::ADMIN}.first
+      expect(admin_role).to have_attributes :role_name=>Role::ADMIN, :mname=>nil
+    end
+
+    it "creates admin" do
+      db_user = User.find(db_admin.id)
+      expect(db_user.has_role([Role::ADMIN], User.name)).to be true
+    end
+  end
 end
