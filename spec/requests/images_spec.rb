@@ -14,7 +14,7 @@ RSpec.describe "Images", type: :request do
 
     it_should_behave_like "create resource", :image
 
-    it_should_behave_like "existing resource", :image
+    it_should_behave_like "modifiable resource", :image
 
   end
 
@@ -26,21 +26,11 @@ RSpec.describe "Images", type: :request do
       expect(parsed_body).to include("errors")
     end
 
-    it "it created" do
-      jpost images_path, image_props
-      expect(response).to have_http_status :created
-      payload = parsed_body
-      expect(payload).to include("id")
-      expect(payload).to include("caption"=>image_props[:caption])
-      expect(payload).to include("user_roles")
-      expect(payload["user_roles"]).to include(Role::ORGANIZER)
-      expect(Role.where(:user_id=>user["id"],:role_name=>Role::ORGANIZER)).to exist
-    end
   end
 
   shared_examples "cannot update" do |status|
     it "update fails with #{status}" do
-      jput image_path(image_id), FactoryGirl.attributes_fr(:image)
+      jput image_path(image_id), FactoryGirl.attributes_for(:image)
       expect(response).to have_http_status status
       expect(parsed_body).to include "errors"
     end
@@ -61,6 +51,17 @@ RSpec.describe "Images", type: :request do
       payload=parsed_body
       expect(payload).to include("id")
       expect(payload).to include("caption"=>image_props[:caption])
+    end
+
+    it "it created" do
+      jpost images_path, image_props
+      expect(response).to have_http_status :created
+      payload = parsed_body
+      expect(payload).to include("id")
+      expect(payload).to include("caption"=>image_props[:caption])
+      expect(payload).to include("user_roles")
+      expect(payload["user_roles"]).to include(Role::ORGANIZER)
+      expect(Role.where(:user_id=>user["id"],:role_name=>Role::ORGANIZER)).to exist
     end
   end
 
@@ -119,7 +120,7 @@ RSpec.describe "Images", type: :request do
       if user_roles.empty?
         expect(payload).to_not include("user_roles")
       else
-        expect(payload["user_rolse"].to_a).to include(*user_roles)
+        expect(payload["user_roles"].to_a).to include(*user_roles)
       end
     end
   end
@@ -162,9 +163,9 @@ RSpec.describe "Images", type: :request do
 
       before(:each) { login account; image_resources; logout }
 
-      it_should_behave_like "cannot create"
-      it_should_behave_like "cannot update", :unathorized
-      it_should_behave_like "cannot delete", :unathorized
+      it_should_behave_like "cannot create", :unauthorized
+      it_should_behave_like "cannot update", :unauthorized
+      it_should_behave_like "cannot delete", :unauthorized
       it_should_behave_like "all fields present", []
     end
 

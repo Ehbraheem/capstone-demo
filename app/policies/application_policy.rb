@@ -6,7 +6,7 @@ class ApplicationPolicy
     @record = record
   end
 
-  def orgaizer_or_admdin?
+  def organizer_or_admin?
     user.has_role([Role::ADMIN, Role::ORGANIZER], @record.model_name.name, @record.id)
   end
 
@@ -75,17 +75,18 @@ class ApplicationPolicy
       user_id ? "=#{user_id}" : "is null"
     end
 
-    def self.merge scope
-      prev = nil
-      scope.select { |r|
-        if prev & prev.id == r.id
-          prev.user_roles << r.role_name if r.role_name
-          false # toss this
-        else
-          r.user_roles << r.role_name if r.role_name
-          prev = r
-        end
-      }
-    end
+  end
+
+  def self.merge(scope)
+    prev = nil
+    scope.select { |r|
+      if prev && prev.id == r.id
+        prev.user_roles << r.role_name if r.role_name
+        false # toss this
+      else
+        r.user_roles << r.role_name if r.role_name
+        prev = r
+      end
+    }
   end
 end

@@ -105,6 +105,35 @@ RSpec.shared_examples "resource index" do |model|
 
 end
 
+RSpec.shared_examples "modifiable resource" do |model|
+  let(:resource) do
+    jpost send("#{model}s_path"), FactoryGirl.attributes_for(model)
+    expect(response).to have_http_status :created
+    parsed_body
+  end
+
+  let(:new_state) { FactoryGirl.attributes_for model }
+
+  it "can update #{model}" do
+    # change to new state
+    jput send("#{model}_path", resource["id"]), new_state
+    expect(response).to have_http_status :no_content
+
+    update_check if respond_to? :update_check
+  end
+
+  it "can be deleted" do
+    jhead send("#{model}_path", resource["id"])
+    expect(response).to have_http_status :ok
+
+    jdelete send("#{model}_path", resource["id"])
+    expect(response).to have_http_status :no_content
+
+    jhead send("#{model}_path", resource["id"])
+    expect(response).to have_http_status(:not_found)
+  end
+end
+
 RSpec.shared_examples "show resource" do |model|
   let(:resource) { FactoryGirl.create(model) }
   let(:payload) { parsed_body}
