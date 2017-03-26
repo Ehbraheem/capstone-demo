@@ -8,6 +8,18 @@ class ImagePolicy < ApplicationPolicy
     true
   end
 
+  def update?
+    organizer?
+  end
+
+  def show?
+    true
+  end
+
+  def destroy?
+    organizer_or_admin?
+  end
+
   class Scope < Scope
     def resolve
       if @user

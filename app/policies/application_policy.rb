@@ -6,6 +6,26 @@ class ApplicationPolicy
     @record = record
   end
 
+  def orgaizer_or_admdin?
+    user.has_role([Role::ADMIN, Role::ORGANIZER], @record.model_name.name, @record.id)
+  end
+
+  def organizer?
+    @user.has_role([Role::ORGANIZER], @record.model_name.name, @record.id)
+  end
+
+  def member_or_organizer?
+    @user.has_role([Role::MEMBER, Role::ORGANIZER], @record.model_name.name, @record.id)
+  end
+
+  def member?
+    @user.has_role([Role::MEMBER], @record.model_name.name, @record.id)
+  end
+
+  def originator?
+    @user.has_role([Role::ORIGINATOR], @record.model_name.name, @record.id)
+  end
+
   def index?
     false
   end

@@ -18,6 +18,7 @@ class ImagesController < ApplicationController
   # GET /images/1.json
   def show
     # render json: @image
+    authorize @image
   end
 
   # POST /images
@@ -28,18 +29,24 @@ class ImagesController < ApplicationController
     @image = Image.new(image_params)
     @image.creator_id = current_user.id
 
-    if @image.save
-      render :show, status: :created, location: @image
-    else
-      # render json: @image.errors, status: :unprocessable_entity
-      render json: {errors:  @image.errors.messages,}, status: :unprocessable_entity
+    User.transaction do
+      if @image.save
+        role = current_user.add_role(Role::ORGANIZER, @image)
+        role.save
+        render :show, status: :created, location: @image
+      else
+        # render json: @image.errors, status: :unprocessable_entity
+        render json: {errors:  @image.errors.messages,}, status: :unprocessable_entity
+      end
     end
+
   end
 
   # PATCH/PUT /images/1
   # PATCH/PUT /images/1.json
   def update
-    @image = Image.find(params[:id])
+    authorize @image
+    # @image = Image.find(params[:id])
 
     if @image.update(image_params)
       head :no_content
@@ -52,6 +59,7 @@ class ImagesController < ApplicationController
   # DELETE /images/1
   # DELETE /images/1.json
   def destroy
+    authorize @image
     @image.destroy
 
     head :no_content

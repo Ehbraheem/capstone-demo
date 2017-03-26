@@ -168,7 +168,7 @@ RSpec.describe "Images", type: :request do
       it_should_behave_like "all fields present", []
     end
 
-    context "caller is authenticated organzer" do
+    context "caller is authenticated organizer" do
 
       let!(:user) { login account }
 
@@ -177,7 +177,7 @@ RSpec.describe "Images", type: :request do
       it_should_behave_like "can create"
       it_should_behave_like "can update"
       it_should_behave_like "can delete"
-      it_should_behave_like "all fields present"#, [Role::ORGANIZER]
+      it_should_behave_like "all fields present", [Role::ORGANIZER]
     end
 
     context "caller is authenticated non-organizer" do
