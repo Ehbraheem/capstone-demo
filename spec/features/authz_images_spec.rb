@@ -193,7 +193,6 @@ RSpec.feature "AuthzImages", type: :feature, js: true do
     after(:each) { logout }
 
     context "unauthenticated user" do
-      binding.pry
 
       background(:each) { logout; visit_images images }
 

@@ -27,7 +27,7 @@ group :development, :test do
   gem 'pry-byebug', '~> 3.4', '>= 3.4.0'
   gem 'httparty', '~> 0.14', '>=0.14.0'
   gem 'tzinfo-data', platform: [:mswin, :mingw, :x64_mingw, :jruby]
-
+  gem 'sqlite3', '~>1.3', '>=1.3.12'
 
   gem 'rspec-rails', '~> 3.5', '>= 3.5.2'
   gem 'mongoid-rspec', '~> 3.0', '>= 3.0.0'

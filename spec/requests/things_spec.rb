@@ -20,7 +20,7 @@ RSpec.describe "Things", type: :request do
   end
 
 
-  shared_examples "can create" do |user_roles=[Role::ORGANIZER|
+  shared_examples "can create" do |user_roles=[Role::ORGANIZER]|
 
     it "can create" do
       jpost things_path, thing_prop
@@ -155,10 +155,11 @@ RSpec.describe "Things", type: :request do
       expect(response.status).to be < 500
     end
 
-    it "fails to update with #{status}"
-    jput thing_path(thing_id), thing_props
-    expect(response).to have_http_status status
-    expect(parsed_body).to include "errors"
+    it "fails to update with #{status}" do
+      jput thing_path(thing_id), thing_props
+      expect(response).to have_http_status status
+      expect(parsed_body).to include "errors"
+    end
   end
 
   shared_examples "field(s) redacted" do
@@ -251,7 +252,7 @@ RSpec.describe "Things", type: :request do
         expect(r).to include("description")
         expect(r).to include("notes")
         expect(r).to include("user_roles")
-        expectr["user_rolse"].to_a).to include *user_roles
+        expect(["user_rolse"].to_a).to include *user_roles
       end
     end
 
