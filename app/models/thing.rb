@@ -1,4 +1,6 @@
 class Thing < ActiveRecord::Base
+  include Protectable
+
   validates :name, presence: true
   # validates_presence_of :name
   has_many :thing_images, inverse_of: :thing, dependent: :destroy

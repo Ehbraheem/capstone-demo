@@ -1,13 +1,21 @@
 class ThingsController < ApplicationController
+
+  include ActionController::Helpers
+  helper ThingsHelper
+
   before_action :set_thing, only: [:show, :update, :destroy]
   before_action :authenticate_user!, only: [:index, :create, :update, :destroy]
   wrap_parameters :thing, include: ["name", "notes", "description"]
 
+  after_action :verify_authorized
+  after_action :verify_policy_scoped, only: [:index]
 
   # GET /things
   # GET /things.json
   def index
-    @things = Thing.all
+    authorize Thing
+    @things = policy_scope Thing.all
+    @things = ThingPolicy.merge(@things)
 
     # render json: @things
   end
@@ -15,25 +23,38 @@ class ThingsController < ApplicationController
   # GET /things/1
   # GET /things/1.json
   def show
+    authorize @thing
+    thing = ThingPolicy::Scope.new(pundit_user,
+                                    Thing.where(:id=>@thing.id))
+                                    .user_roles false
+    @thing = ThingPolicy.merge(thing).first
     # render json: @thing
   end
 
   # POST /things
   # POST /things.json
   def create
+    authorize Thing
     @thing = Thing.new(thing_params)
 
-    if @thing.save
-      # byebug
-      render :show, status: :created, location: @thing
-    else
-      render json: {errors: @thing.errors.messages }, status: :unprocessable_entity
+    User.transaction do
+      if @thing.save
+        # byebug
+        role = current_user.add_role(Role::ORGANIZER, @thing)
+        @thing.user_roles << role.role_name
+        role.save!
+        render :show, status: :created, location: @thing
+      else
+        render json: {errors: @thing.errors.messages }, status: :unprocessable_entity
+      end
     end
+
   end
 
   # PATCH/PUT /things/1
   # PATCH/PUT /things/1.json
   def update
+    authorize @thing
     @thing = Thing.find(params[:id])
 
     if @thing.update(thing_params)
@@ -46,6 +67,7 @@ class ThingsController < ApplicationController
   # DELETE /things/1
   # DELETE /things/1.json
   def destroy
+    authorize @thing
     @thing.destroy
 
     head :no_content

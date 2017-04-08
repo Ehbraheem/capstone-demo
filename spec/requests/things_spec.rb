@@ -8,7 +8,7 @@ RSpec.describe "Things", type: :request do
   let(:originator) { apply_originator(signup(FactoryGirl.attributes_for(:user)), Thing) }
 
   context "quick API check" do
-    let!(:user) { login account}
+    let!(:user) { login originator }
 
     it_should_behave_like "resource index", :thing
 

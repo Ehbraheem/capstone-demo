@@ -3,10 +3,12 @@ require 'rails_helper'
 RSpec.describe "ThingImages", type: :request do
 
   include_context "db_cleanup_each"
-  let(:account) { signup FactoryGirl.attributes_for(:user) }
-  let!(:user) { login account}
+  let(:originator) { apply_originator(signup(FactoryGirl.attributes_for(:user)), Thing) }
+
 
   describe "manage thing/image relationships" do
+
+    let!(:user) { login originator}
 
     context "valid thing and image" do
       let(:thing) { create_resource(things_path, :thing, :created) }
@@ -64,7 +66,7 @@ RSpec.describe "ThingImages", type: :request do
     end
   end
 
-  shared_examples "get linkables" do |count|
+  shared_examples "get linkables" do |count, user_roles=[]|
     it "return linkable things" do
       # byebug
       jget image_linkable_things_path(images[0]["id"])
@@ -76,6 +78,8 @@ RSpec.describe "ThingImages", type: :request do
           expect(thing["id"]).to be_in(unlinked_things.map { |t| t["id"]})
           expect(thing).to include("description")
           expect(thing).to include("notes")
+          expect(thing).to include "user_roles"
+          expect(thing["user_roles"]).to include *user_roles
         end
       end
     end
@@ -95,6 +99,18 @@ RSpec.describe "ThingImages", type: :request do
       expect(response).to have_http_status(:no_content)
       jget thing_thing_images_path(thing["id"])
       expect(parsed_body.size).to eq(images.count+1)
+    end
+
+    it "bad request when link to unknown Image" do
+      jpost thing_thing_image_path(linked_thing_id),
+                                    thing_image_props.merge(:image_id=>9999999)
+      expect(response).to have_http_status :bad_request
+    end
+
+    it "bad request when link to unknown Thing" do
+      jpost image_thing_images_path(thing_image_props[:image_id]),
+                                    thing_image_props.merge(:tihing_id=>999999)
+      expect(response).to have_http_status :bad_request
     end
   end
 
@@ -117,7 +133,7 @@ RSpec.describe "ThingImages", type: :request do
 
   shared_examples "cannot create link" do |status|
     it "cannot create link" do
-      jpost thing_thing_images_path(thing["id"]), thing_image_props
+      jpost thing_thing_images_path(linked_thing_id), thing_image_props
       expect(response).to have_http_status(status)
     end
   end
@@ -139,22 +155,30 @@ RSpec.describe "ThingImages", type: :request do
 
   describe "ThingImage Authn policies" do
 
-    let(:thing) { create_resource(things_path, :thing, :created) }
-    let(:thing_image) {
-      # return existing thing so we can modify
-      jget thing_thing_images_path(thing["id"])
+    let(:account)         { signup FactoryGirl.attributes_for(:user) }
+    let(:thing_resources) { 3.times.map { create_resource(things_path, :thing, :created ) } }
+    let(:image_resources) { 4.times.map { create_resource(images_path, :image, :created ) } }
+    let(:things) { thing_resources.map { |t| Thing.find(t["id"]) } }
+    let(:linked_thing)    { things[0] }
+    let(:linked_thing_id)  { linked_thing.id }
+    let(:linked_image_ids)  { (0..2).map { |idx| image_resources[idx]["id"] } }
+    let(:unlinked_thing_ids) { (1..2).map { |idx| thing_resources[idx]["id"] } }
+    let(:linked_image_id)    { image_resources[0]["id"] }
+    let(:orphan_image_id)    { image_resources[3]["id"] } #unlinked image that will be linked
+    let(:thing_image_props)  { { :image_id=>orphan_image_id }} #payload required to link image and thing
+    let(:thing_image) { # return existing thing so we can modify
+      jget thing_thing_images_path(linked_thing_id)
       expect(response).to have_http_status :ok
       parsed_body[0]
     }
-    let(:images) { (1..3).map { create_resource(images_path, :image, :created) } }
-    let!(:unlinked_things) { (1..2).map { create_resource(things_path, :thing, :created) } }
-    let(:orphan_image) { FactoryGirl.create(:image) } # unlinked image
-    let(:thing_image_props) { { :image_id=>orphan_image.id } } # payload required to link
 
     before(:each) do
-      images.map do |image| # link thing and images
+      login originator
+      thing_resources
+      image_resources
+      linked_image_ids.each do |image_id| # link thing and images
         # byebug
-        jpost thing_thing_images_path(thing["id"]), { :image_id=>image["id"] }
+        jpost thing_thing_images_path(linked_thing_id), { :image_id=>image_id }
         expect(response).to have_http_status :no_content
       end
     end
@@ -164,7 +188,7 @@ RSpec.describe "ThingImages", type: :request do
 
       it_should_behave_like "can get links"
 
-      it_should_behave_like "get linkables", 2
+      it_should_behave_like "get linkables", 0
 
       it_should_behave_like "cannot create link", :unauthorized
 
@@ -175,17 +199,50 @@ RSpec.describe "ThingImages", type: :request do
     end
 
     context "authenticated user" do
+      before(:each) { login account}
 
       it_should_behave_like "can get links"
 
-      it_should_behave_like "get linkables", 2
+      it_should_behave_like "get linkables", 0
 
+      it_should_behave_like "cannot create link", :forbidden
+
+      it_should_behave_like "cannot update link", :forbiddden
+
+      it_should_behave_like "cannot delete link", :forbidden
+
+    end
+
+    context "user is a member" do
+
+      before(:each) do
+        login apply_member(account, things)
+      end
+
+      it_should_behave_like "can get links"
+      it_should_behave_like "can get linkables", 2, [Role::MEMBER]
       it_should_behave_like "can create link"
+      it_should_behave_like "cannot update link", :forbidden
+      it_should_behave_like "cannot delete link", :forbidden
+    end
 
-      it_should_behave_like "can update link"
-
+    context "user is organizer" do
+      it_should_behave_like "can get links"
+      it_should_behave_like "can get linkables", 2, [Role::ORGANIZER]
+      it_should_behave_like "can create link"
+      it should_behave_like "can update link"
       it_should_behave_like "can delete link"
+    end
 
+    context "user is admin" do
+
+      before(:each) { login apply_admin(account) }
+
+      it_should_behave_like "can get links"
+      it_should_behave_like "can get linkables", 0
+      it_should_behave_like "cannot create link", :forbidden
+      it_should_behave_like "cannot update link", :forbidden
+      it_should_behave_like "cannot delete link"
     end
 
   end

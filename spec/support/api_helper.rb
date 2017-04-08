@@ -56,7 +56,7 @@ module ApiHelper
   def create_resource path, factory, status=:created
     # byebug
     jpost path, FactoryGirl.attributes_for(factory)
-    expect(response).to have_http_status status
+    expect(response).to have_http_status status if status
     parsed_body
   end
 
@@ -90,9 +90,9 @@ module ApiHelper
 end
 
 RSpec.shared_examples "resource index" do |model|
-
-  let!(:resources) { (1..5).map { |idx| FactoryGirl.create(model) } }
-  let(:payload) { parsed_body }
+  let!(:resources) { (1..5).map {|idx| FactoryGirl.create(model) } }
+  let!(:apply_roles) { apply_orgaizer User.find(user["id"]), resources}
+  let(:payload) { parsed_body}
 
   it "returns all #{model.to_s.classify} instances" do
     jget send("#{model}s_path"), {}, { "Accept" => "application/json"}
