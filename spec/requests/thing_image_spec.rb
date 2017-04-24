@@ -5,6 +5,7 @@ RSpec.describe "ThingImages", type: :request do
   include_context "db_cleanup_each"
   let(:originator) { apply_originator(signup(FactoryGirl.attributes_for(:user)), Thing) }
 
+  # TODO: Fix typos that are failling tests
 
   describe "manage thing/image relationships" do
 
