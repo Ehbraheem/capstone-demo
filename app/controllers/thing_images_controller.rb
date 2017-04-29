@@ -9,7 +9,7 @@ class ThingImagesController < ApplicationController
   before_action :get_image, only: [:image_things]
   before_action :authenticate_user!, only: [:create, :update, :destroy]
   after_action :verify_authorized
-  after_action :verify_policy_scoped, only: [:linkable_things]
+  # after_action :verify_policy_scoped, only: [:linkable_things]
 
   def index
     authorize @thing, :get_images?
@@ -26,8 +26,11 @@ class ThingImagesController < ApplicationController
     authorize Thing, :get_linkables?
     # byebug
     image = Image.find(params[:image_id])
-    @things = policy_scope Thing.not_linked(image)
-    @thing = ThingPolicy.merge(@things)
+    # @things = policy_scope Thing.not_linked(image)
+    # need to exclude admins from seeing things they cannot link
+    @things = Thing.not_linked(image)
+    @things = ThingPolicy::Scope.new(current_user, @things).user_roles(true, false)
+    @things = ThingPolicy.merge(@things)
     render "things/index"
   end
 
