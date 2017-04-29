@@ -2,7 +2,7 @@ Rails.application.routes.draw do
 
 
 
-  get 'authn/whoami'
+  get 'authn/whoami', defaults: { format: :json}
 
   get 'authn/checkme'
 

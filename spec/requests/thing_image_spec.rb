@@ -221,17 +221,18 @@ RSpec.describe "ThingImages", type: :request do
       end
 
       it_should_behave_like "can get links"
-      it_should_behave_like "can get linkables", 2, [Role::MEMBER]
+      it_should_behave_like "get linkables", 2, [Role::MEMBER]
       it_should_behave_like "can create link"
       it_should_behave_like "cannot update link", :forbidden
       it_should_behave_like "cannot delete link", :forbidden
     end
 
     context "user is organizer" do
+
       it_should_behave_like "can get links"
-      it_should_behave_like "can get linkables", 2, [Role::ORGANIZER]
+      it_should_behave_like "get linkables", 2, [Role::ORGANIZER]
       it_should_behave_like "can create link"
-      it should_behave_like "can update link"
+      it_should_behave_like "can update link"
       it_should_behave_like "can delete link"
     end
 
@@ -240,7 +241,7 @@ RSpec.describe "ThingImages", type: :request do
       before(:each) { login apply_admin(account) }
 
       it_should_behave_like "can get links"
-      it_should_behave_like "can get linkables", 0
+      it_should_behave_like "get linkables", 0
       it_should_behave_like "cannot create link", :forbidden
       it_should_behave_like "cannot update link", :forbidden
       it_should_behave_like "cannot delete link"
