@@ -33,16 +33,18 @@
         return APP_CONFIG.thing_editor_html;
     }
 
-    ThingsSelectorController.$inject = ["$scope","$stateParams", "spa-demo.subjects.Things"];
+    ThingsSelectorController.$inject = ["$scope","$stateParams", "spa-demo.authz.Authz", "spa-demo.subjects.Things"];
 
-    function ThingsSelectorController ($scope, $stateParams, Things) {
+    function ThingsSelectorController ($scope, $stateParams, Authz, Things) {
         var $ctrl = this;
 
         $ctrl.$onInit = function () {
             console.log("ThingSelectorController", $scope);
-            if (!$stateParams.id) {
-                $ctrl.things = Things.query();
-            }
+            $scope.$watch(function () { return Authz.getAuthorizedUserId();},
+                function () {
+                    if (!$stateParams.id) {
+                        $ctrl.items = Image.query();
+                    }})
         };
 
         return;
@@ -51,10 +53,11 @@
 
     ThingsEditorController.$inject = ["$scope", "$q", "$state",
                                         "$stateParams",
+                                        "spa-demo.authz.Authz",
                                         "spa-demo.subjects.Things",
                                         "spa-demo.subjects.ThingImage"];
 
-    function ThingsEditorController ($scope, $q, $state, $stateParams, Things, ThingImage) {
+    function ThingsEditorController ($scope, $q, $state, $stateParams, Authz, Things, ThingImage) {
         var $ctrl            = this;
         $ctrl.clear          = clear;
         $ctrl.remove         = remove;
@@ -64,19 +67,18 @@
 
         $ctrl.$onInit = function () {
             console.log("ThingsEditorController", $scope);
-            if ($stateParams.id) {
-                // reload($stateParams.id);
-                $scope.$watch(
-                    function () {
-                        return $ctrl.authz.authenticated;
-                    },
-                    function () {
+            $scope.$watch(
+                function () {
+                    return Authz.getAuthorizedUserId();
+                },
+                function () {
+                    if ($stateParams.id) {
                         reload($stateParams.id);
+                    } else {
+                        newResource();
                     }
-                )
-            } else {
-                newResource();
-            }
+                }
+            );
         };
 
         return;

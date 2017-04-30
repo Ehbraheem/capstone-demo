@@ -12,6 +12,7 @@
             "spa-demo.foos",
             "spa-demo.authn",
             "spa-demo.layout",
-            "spa-demo.subjects"
+            "spa-demo.subjects",
+            "spa-demo.authz"
         ]);
 })();

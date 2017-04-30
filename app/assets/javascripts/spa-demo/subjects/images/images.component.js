@@ -29,15 +29,18 @@
 
     ImageSelectorController.$inject = ["$scope",
                                         "$stateParams",
+                                        "spa-demo.authz.Authz",
                                         "spa-demo.subjects.Image"];
-    function ImageSelectorController ($scope, $stateParams, Image) {
+    function ImageSelectorController ($scope, $stateParams, Authz, Image) {
         var $ctrl = this;
 
         $ctrl.$onInit = function () {
             console.log("ImageSelectorController", $stateParams, $scope);
-            if (!$stateParams.id) {
-                $ctrl.items = Image.query();
-            }
+            $scope.$watch(function () { return Authz.getAuthorizedUserId();},
+                          function () {
+                            if (!$stateParams.id) {
+                              $ctrl.items = Image.query();
+                          }})
         }
 
         return;
@@ -52,12 +55,13 @@
 
     ImageEditorController.$inject = ["$scope", "$q",
                                     "$stateParams", "$state",
+                                    "spa-demo.authz.Authz",
                                     "spa-demo.subjects.Image",
                                     "spa-demo.subjects.ImageThing",
                                     "spa-demo.subjects.ImageLinkableThing",
                                     ];
 
-    function ImageEditorController ($scope, $q, $stateParams, $state,
+    function ImageEditorController ($scope, $q, $stateParams, $state, Authz,
                                     Image, ImageThing, ImageLinkableThing) {
         var $ctrl = this;
         $ctrl.create = create;
@@ -67,19 +71,19 @@
 
         $ctrl.$onInit = function () {
             console.log("ImageSelectorController", $scope);
-            if ($stateParams.id) {
-                // reload($stateParams.id);
-                $scope.$watch(
-                    function () {
-                        return $ctrl.authz.authenticated;
-                    },
-                    function () {
+            // reload($stateParams.id);
+            $scope.$watch(
+                function () {
+                    return Authz.getAuthorizedUserId();
+                },
+                function () {
+                    if ($stateParams.id) {
                         reload($stateParams.id);
+                    } else {
+                        newResource();
                     }
-                );
-            } else {
-                newResource();
-            }
+                }
+            );
         }
 
         return;
