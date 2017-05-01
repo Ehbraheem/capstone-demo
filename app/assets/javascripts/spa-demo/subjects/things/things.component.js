@@ -43,7 +43,7 @@
             $scope.$watch(function () { return Authz.getAuthorizedUserId();},
                 function () {
                     if (!$stateParams.id) {
-                        $ctrl.items = Image.query();
+                        $ctrl.items = Things.query();
                     }})
         };
 
