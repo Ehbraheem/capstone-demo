@@ -1,6 +1,8 @@
 require 'rails_helper'
 require_relative '../support/subject_ui_helper.rb'
 
+# FIXME: Make sure it matches with the course repo
+
 RSpec.feature "AuthzImages", type: :feature, js: true do
 
   include_context "db_cleanup_each"
@@ -209,7 +211,8 @@ RSpec.feature "AuthzImages", type: :feature, js: true do
       it_behaves_like "can list images"
       it_behaves_like "displays correct button for role",
                       ["Create Image"],
-                      ["create Image", "Clear Image", "Update Image", "Delete Image"]
+                      ["Clear Image", "Update Image", "Delete Image"]
+      it_behaves_like "can create image"
     end
   end
 

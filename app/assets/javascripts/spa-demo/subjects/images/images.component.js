@@ -19,6 +19,9 @@
             controller : ImageEditorController,
             bindings : {
                 authz: '<'
+            },
+            require: {
+                imagesAuthz: "^sdImagesAuthz"
             }
         });
 
@@ -64,10 +67,12 @@
     function ImageEditorController ($scope, $q, $stateParams, $state, Authz,
                                     Image, ImageThing, ImageLinkableThing) {
         var $ctrl = this;
+        $ctrl.selected_linkables = [];
         $ctrl.create = create;
         $ctrl.clear = clear;
         $ctrl.update = update;
         $ctrl.remove = remove;
+        $ctrl.linkThings = linkThings;
 
         $ctrl.$onInit = function () {
             console.log("ImageSelectorController", $scope);
@@ -91,6 +96,7 @@
 
         function newResource() {
             $ctrl.item = new Image();
+            $ctrl.imagesAuthz.newItem($ctrl.item);
             return $ctrl.item;
         }
 
@@ -100,6 +106,8 @@
             $ctrl.item = Image.get({id:itemId});
             $ctrl.things = ImageThing.query({image_id: itemId});
             $ctrl.linkable_things = ImageLinkableThing.query({image_id:itemId});
+            $ctrl.imagesAuthz.newItem($ctrl.item);
+
             $q.all([$ctrl.item.$promise,
                 $ctrl.things.$promise]).catch(handleError);
         }
