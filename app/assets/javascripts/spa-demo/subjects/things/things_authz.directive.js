@@ -30,9 +30,11 @@
         }
     }
 
-    ThingsAuthzController.$inject = ["$scope", "spa-demo.authn.Authn" ];
+    ThingsAuthzController.$inject = ["$scope",
+                                     "spa-demo.authn.Authn",
+                                     "spa-demo.subjects.ThingAuthz"];
 
-    function ThingsAuthzController ($scope, Authn) {
+    function ThingsAuthzController ($scope, Authn, ThingAuthz) {
         var vm                   = this;
         vm.authz                 = {};
         vm.authz.canUpdateItem   = canUpdateItem;
@@ -53,13 +55,14 @@
         ////////////////////////////////
         function activate() {
             vm.resetAccess();
-            $scope.$watch(Authn.getCurrentUser, newUser);
+            // $scope.$watch(Authn.getCurrentUser, newUser);
+            newUser();
         }
 
         function newUser(user, prevUser) {
             console.log("newUser=", user, ", prev=",prevUser);
             vm.authz.canQuery = true;
-            vm.authz.authenticated = Authn.isAuthenticated();
+            vm.authz.authenticated = ThingAuthz.isAuthenticated();
             if (vm.authz.authenticated) {
                 vm.authz.canCreate       = true;
                 vm.authz.canUpdate       = true;
@@ -73,7 +76,7 @@
         }
 
         function canUpdateItem(item) {
-            return Authn.isAuthenticated();
+            return ThingAuthz.isAuthenticated();
         }
     }
 })();

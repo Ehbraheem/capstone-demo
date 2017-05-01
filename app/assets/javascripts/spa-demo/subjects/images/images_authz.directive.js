@@ -31,9 +31,11 @@
         }
     }
 
-    ImagesAuthzController.$inject = ["$scope", "spa-demo.authn.Authn"];
+    ImagesAuthzController.$inject = ["$scope",
+                                     "spa-demo.authn.Authn",
+                                     "spa-demo.subjects.ImageAuthz"];
 
-    function ImagesAuthzController ($scope, Authn) {
+    function ImagesAuthzController ($scope, Authn, ImageAuthz) {
         var vm = this;
         vm.authz = {};
         vm.authz.authenticated = false;
@@ -57,13 +59,14 @@
         //////////////////////////
         function activate() {
             vm.resetAccess();
-            $scope.$watch(Authn.getCurrentUser, newUser);
+            // $scope.$watch(Authn.getCurrentUser, newUser);
+            newUser();
         }
 
         function newUser(user, prevUser) {
             console.log("newUser=", user, ", prev=",prevUser);
             vm.authz.canQuery  = true;
-            vm.authz.authenticated = Authn.isAuthenticated();
+            vm.authz.authenticated = ImageAuthz.isAuthenticated();
             if (vm.authz.authenticated) {
                 vm.authz.canCreate     = true;
                 vm.authz.canUpdate     = true;
@@ -75,7 +78,7 @@
         }
 
        function canUpdateItem (item) {
-           return Authn.isAuthenticated();
+           return ImageAuthz.isAuthenticated();
        }
     }
 })();
