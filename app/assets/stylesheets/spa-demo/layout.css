@@ -1,10 +1,31 @@
+/* 
+* layout.css
+*/
+
 body {
     background-color: #d2b48c;
 }
+
 form .invalid {
     color: red;
 }
+
 .fullsize {
     padding-right: 0%;
     padding-left: 0%;
+}
+
+/********************* navbar ****************/
+
+.nav li form {
+	padding-left: 10px; /* adds spacing along the left of dropdown menu form */
+	padding-right: 10px;
+}
+
+[readonly='readonly'] {
+	background-color: inherit;
+}
+
+button:disabled {
+	color: #717782;
 }

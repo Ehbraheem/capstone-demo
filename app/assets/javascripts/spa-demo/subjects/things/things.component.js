@@ -20,6 +20,9 @@
             controller : ThingsEditorController,
             bindings : {
                 authz: '<'
+            },
+            require : {
+                thingsAuthz: "^sdThingsAuthz"
             }
         });
 
@@ -86,6 +89,7 @@
 
         function newResource() {
             $ctrl.thing = new Things();
+            $ctrl.thingsAuthz.newItem($ctrl.thing);
             return $ctrl.thing;
         };
 
@@ -94,6 +98,7 @@
             console.log("re/loading thing", itemId);
             $ctrl.images = ThingImage.query({thing_id: itemId});
             $ctrl.thing = Things.get({id:itemId});
+            $ctrl.thingsAuthz.newItem($ctrl.thing);
             $ctrl.images.$promise.then(
               function () {
                   angular.forEach($ctrl.images, function (ti) {

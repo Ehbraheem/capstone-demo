@@ -31,52 +31,62 @@
     }
 
     ThingsAuthzController.$inject = ["$scope",
-                                     "spa-demo.authn.Authn",
                                      "spa-demo.subjects.ThingAuthz"];
 
-    function ThingsAuthzController ($scope, Authn, ThingAuthz) {
+    function ThingsAuthzController ($scope, ThingAuthz) {
         var vm                   = this;
         vm.authz                 = {};
         vm.authz.canUpdateItem   = canUpdateItem;
+        vm.newItem               = newItem;
 
-        ThingsAuthzController.prototype.resetAccess = function () {
-            this.authz.canQuery       = false;
-            this.authz.canCreate      = false;
-            this.authz.canUpdate      = false;
-            this.authz.canDelete      = false;
-            this.authz.canGetDetails  = false;
-            this.authz.canUpdateImage = false;
-            this.authz.canRemoveImage = false;
-        }
 
         activate();
 
         return;
         ////////////////////////////////
         function activate() {
-            vm.resetAccess();
             // $scope.$watch(Authn.getCurrentUser, newUser);
-            newUser();
+            vm.newItem(null);
         }
 
-        function newUser(user, prevUser) {
-            console.log("newUser=", user, ", prev=",prevUser);
-            vm.authz.canQuery = true;
+        function newItem(item) {
+            ThingAuthz.getAuthorizedUser().then(
+                (user) => authzUserItem(item, user),
+                (user) => authzUserItem(item, user))
+        }
+
+        function authzUserItem(item, user) {
+            console.log("new Item/Authz", item, user);
+
             vm.authz.authenticated = ThingAuthz.isAuthenticated();
-            if (vm.authz.authenticated) {
-                vm.authz.canCreate       = true;
-                vm.authz.canUpdate       = true;
-                vm.authz.canDelete       = true;
-                vm.authz.canGetDetails   = true;
-                vm.authz.canUpdateImage  = true;
-                vm.authz.canRemoveImage  = true;
+            vm.authz.canQuery      = ThingAuthz.canQuery();
+            vm.authz.canCreate     = ThingAuthz.canCreate();
+
+            if (item && item.$promise) {
+                vm.authz.canUpdate      = false;
+                vm.authz.canDelete      = false;
+                vm.authz.canGetDetails  = false;
+                vm.authz.canRemoveImage = false;
+                vm.authz.canUpdateImage = false;
+
+                item.$promise.then( (item) => checkAccess(item););
             } else {
-                vm.resetAccess();
+                checkAccess(item);
             }
         }
 
+        function checkAccess(item) {
+            vm.authz.canUpdate = ThingAuthz.canUpdate(item);
+            vm.authz.canGetDetails = ThingAuthz.canGetDetails(item);
+            vm.authz.canDelete = ThingAuthz.canDelete(item);
+            vm.authz.canUpdateImage = ThingAuthz.canUpdateImage(item);
+            vm.authz.canRemoveImage = ThingAuthz.canRemoveImage(item);
+
+            console.log("checkAccess", item, vm.authz);
+        }
+
         function canUpdateItem(item) {
-            return ThingAuthz.isAuthenticated();
+            return ThingAuthz.canUpdate(item);
         }
     }
 })();
