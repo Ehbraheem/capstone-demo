@@ -40,7 +40,7 @@ class ImageContent
   	if content
   		case 
   		when (CONTENT_TYPES.include? content_type)
-  			EXIFR::JPEG.new StringIO.new(content.data)
+  			EXIFR::JPEG.new(StringIO.new(content.data))
   		end
   	end
   end
