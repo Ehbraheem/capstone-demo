@@ -12,6 +12,9 @@
 !/log/.keep
 /tmp
 /.idea
+*.swp
+
+/db/images
 
 /client/build
 
