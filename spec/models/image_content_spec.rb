@@ -187,7 +187,27 @@ RSpec.describe ImageContent, type: :model do
   end
 
   context "Image scaling" do
-  	it "creates for Image with ImageContent"
+  	include_context "db_scope"
+
+  	let(:image)           { FactoryGirl.build(:image) }
+  	let(:image_content)   { FactoryGirl.build(:image_content) }
+
+  	before(:each) do
+  		expect(defined? ImageContentCreator).to eq "constant"
+  		image.save # generate an ID for image w/o saving content
+  	end
+
+  	after(:each) do
+  		expect(ImageContent.image(image).count).to eq 5
+  		expect(ImageContent.image(image).where(original=>true).count).to eq 1
+  		expect(ImageContent.image(image).not.where(original: true)).to eq 4
+  	end
+
+  	it "creates for Image with ImageContent" do
+  		creator = ImageContentCreator.new image
+  		creator.build_contents
+  		expect(creator.save!).to eq true
+  	end
   	it "creates for Image and ImageContent"
   end
 

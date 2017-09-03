@@ -1,8 +1,14 @@
 class ImageContent
+	include Mongoid::Document
+
+	#3:2 ratios
+	THUMBNAIL = "100x67"
+	SMALL = "320x213"
+	MEDIUM = "800x533"
+	LARGE = "1200x800"
 	CONTENT_TYPES = %w(image/jpeg image/jpg)
 	MAX_CONTENT_SIZE = 10*1000*1024
 
-  include Mongoid::Document
   field :image_id, type: Integer
   field :width, type: Integer
   field :height, type: Integer
@@ -13,6 +19,8 @@ class ImageContent
   validates_presence_of :image_id, :height, :width, :content_type, :content
   validate :validate_width_height
   validate :validate_content_length
+
+  scope :image, ->(image) { where(image_id: image.id) if image }
 
   def self.to_binary value
   	case 
