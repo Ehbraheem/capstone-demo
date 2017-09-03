@@ -65,6 +65,10 @@ class ImageContent
   	end
   end
 
+  def suffix
+  	"jpg" if CONTENT_TYPES.include? content_type
+  end
+
   private
 
   	def validate_width_height
