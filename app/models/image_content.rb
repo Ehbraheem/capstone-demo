@@ -16,11 +16,23 @@ class ImageContent
   field :content, type: BSON::Binary
   field :original, type: Mongoid::Boolean
 
+  index({image_id:1, width:1, height:1}, {name: "fdx_image_size"})
+
   validates_presence_of :image_id, :height, :width, :content_type, :content
   validate :validate_width_height
   validate :validate_content_length
 
   scope :image, ->(image) { where(image_id: image.id) if image }
+  scope :smallest, ->(min_width=nil, min_height=nil) { 
+  	if min_width || min_height
+  		query = where({})
+  		query = query.where(width: {:$gte=> min_width}) if min_width
+  		query = query.where(height: {:$gte=> min_height}) if min_height
+  		query.order(width.asc, height.asc).limit(1)
+  	else
+  		order(:width.desc, height.desc).limit(1)
+  	end
+  }
 
   def self.to_binary value
   	case 
