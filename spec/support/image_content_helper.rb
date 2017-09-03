@@ -1,6 +1,6 @@
 module ImageContentHelper
 	
-	BASE_URL = "http://dev9.jhuep.com/fullstack-capstone"
+	BASE_URL = "https://dev9.jhuep.com/fullstack-capstone"
 	URL_PATH = "db/bta/skyline.jpg"
 	IMAGE_PATH = "db/images/sample.jpg"
 
@@ -20,4 +20,11 @@ module ImageContentHelper
 		return File.new(IMAGE_PATH, "rb")
 	end
 
+	def validation_check object, field
+		object.send("#{field}=", nil)
+		expect(object.validate).to be false
+  	expect(object.errors.messages).to include field
+	end
+
 end
+
