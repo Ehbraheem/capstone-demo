@@ -63,4 +63,42 @@ RSpec.describe ImageContent, type: :model do
   		expect(ic.content.data.size).to eq fin.size
   	end
   end
+
+  context "set size from JPEG" do
+  	let(:ic) { ImageContent.new content_type: "image/jpg", content: fin }
+
+  	it "reads EXIF from JPEG" do
+  		expect(exif=ic.exif).to_not be_nil
+  		expect(exif.width).to_not be_nil
+  		expect(exif.height).to_not be_nil
+  	end
+  	it "sets size from EXIF" do
+  		expect(ic.width).to eq ic.exif.width
+  		expect(ic.height).to eq ic.exif.height
+  	end
+  	it "sets size manually" do
+  		width=666; height=444
+  		ic = ImageContent.new(
+  			width: width,
+  			height: height,
+  			content_type: "image/png",
+  			content: fin)
+  		expect(ic.width).to eq width
+  		expect(ic.height).to eq height
+  	end
+  end
+
+  context "valid image content" do
+  	it "requires image"
+  	it "requires content_type"
+  	it "requires content"
+  	it "requires width"
+  	it "requires height"
+  	it "requires supported content_type"
+  	it "checks content size maximum"
+  end
+
+  context "image content factory" do
+  	
+  end
 end
