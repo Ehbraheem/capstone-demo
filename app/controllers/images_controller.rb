@@ -19,8 +19,8 @@ class ImagesController < ApplicationController
   def content
     result = ImageContent.image(@image).smallest.first
     if result
-      options = type: result.content_type, disposition: "inline",
-                filename: "#{@image.basename}.#{result.suffix}"
+      options = {type: result.content_type, disposition: "inline",
+                      filename: "#{@image.basename}.#{result.suffix}"}
       send_data result.content.data, options
     else
       render nothing: true, status: :not_found
@@ -80,6 +80,7 @@ class ImagesController < ApplicationController
   # DELETE /images/1.json
   def destroy
     authorize @image
+    ImageContent.image(@image).delete_all
     @image.destroy
 
     head :no_content
