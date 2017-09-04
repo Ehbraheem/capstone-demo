@@ -19,7 +19,7 @@ class ImagesController < ApplicationController
   end
 
   def content
-    result = ImageContent.image(@image).smallest.first
+    result = ImageContent.image(@image).smallest(params[:width]), params[:height]).first
     if result
       options = {type: result.content_type, disposition: "inline",
                       filename: "#{@image.basename}.#{result.suffix}"}

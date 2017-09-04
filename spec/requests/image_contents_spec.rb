@@ -136,8 +136,82 @@ RSpec.describe "ImageContents", type: :request do
 			expect(payload["errors"]).to include "content_type"
 			expect(payload["errors"]["content_type"]).to include /not supported type/
 		end
+
+		it "rejects image too large" do
+			content = ""
+			decoded_pad = Base64.decode64 image_props[:image_content][:content]
+			begin
+				content += decoded_pad
+			end while content.size < ImageContent::MAX_CONTENT_SIZE
+			image_props[:image_content][:content] = Base64.encode64 content
+
+			jpost images_url, image_props
+			expect(response).to have_http_status :unprocessable_entity
+			payload = parsed_body
+			expect(payload["errors"]).to include "content"
+			expect(payload["errors"]["content"]).to include /too large/
+		end
 	end
 
+	context "content queries" do
+		let(:image_content) { ImageContent.image(@image) }
+		before(:each) do
+			unless @image
+				jpost images_url, image_props
+				expect(response).to have_http_status :created
+				@image = Image.find(parsed_body["id"])
+			end
+		end
+
+		it "provides size equal to width only" do
+			ics = image_content.order(:width.asc)
+			get image_content_url @image, { width: ics[2].width}
+			expect(response).to have_http_status :ok
+			expect(response.body.size).to eq ics[2].content.data.size
+		end
+
+		it "provides smallest size GTE width only" do
+      ics=image_content.order(:width.asc)
+      get image_content_url(@image, {width:ics[2].width+1})
+      expect(response).to have_http_status(:ok)
+      expect(response.body.size).to eq(ics[3].content.data.size)
+    end
+
+    it "provides size equal to height only" do
+      ics=image_content.order(:height.asc)
+      get image_content_url(@image, {height:ics[3].height})
+      expect(response).to have_http_status(:ok)
+      expect(response.body.size).to eq(ics[3].content.data.size)
+    end
+
+    it "provides smallest size GTE height only" do
+      ics=image_content.order(:height.asc)
+      get image_content_url(@image, {height:ics[3].height+1})
+      expect(response).to have_http_status(:ok)
+      expect(response.body.size).to eq(ics[4].content.data.size)
+    end
+
+    it "provides size equal to width and height" do
+      ics=image_content.order(:height.asc)
+      get image_content_url(@image, {width:ics[2].width, height:ics[3].height})
+      expect(response).to have_http_status(:ok)
+      expect(response.body.size).to eq(ics[3].content.data.size)
+    end
+
+    it "provides smallest size GTE width and height" do
+      ics=image_content.order(:height.asc)
+      get image_content_url(@image, {width:ics[4].width, height:ics[2].height})
+      expect(response).to have_http_status(:ok)
+      expect(response.body.size).to eq(ics[4].content.data.size)
+    end
+
+    it "provides largest size " do
+      ics=image_content.order(:height.desc)
+      get image_content_url(@image)
+      expect(response).to have_http_status(:ok)
+      expect(response.body.size).to eq(ics.first.content.data.size)
+    end
+	end
 end
 
 shared_examples "image requires parameter" do |parameter|
@@ -146,5 +220,11 @@ shared_examples "image requires parameter" do |parameter|
 		image_props[:image_content].delete(parameter)
 		jpost images_url, image_props
 		expect(response).to have_http_status :bad_request
+		expect(Image.count).to eq(start_count) #image is not saved
+
+    payload=parsed_body
+    expect(payload).to include("errors")
+    expect(payload["errors"]).to include("full_messages")
+    expect(payload["errors"]["full_messages"][0]).to include("param is missing", parameter.to_s)
 	end
 end
