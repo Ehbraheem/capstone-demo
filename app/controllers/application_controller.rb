@@ -15,6 +15,8 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
   rescue_from Mongoid::Errors::DocumentNotFound, with: :record_not_found
 
+  rescue_from Mongoid::Errors::Validations, with: :mongoid_validation_error
+
   # intercept ActionController::ParameterMissing exception
   rescue_from ActionController::ParameterMissing, with: :params_missing
 
@@ -54,5 +56,11 @@ class ApplicationController < ActionController::API
       }
       render :json => payload, :status => :forbidden
       Rails.logger.debug exception
+    end
+
+    def mongoid_validation_error exception
+      payload = { errors: exception.record.errors.messages }
+      render :json => payload, :status => :unprocessable_entity
+      Rails.logger.debug exception.message
     end
 end

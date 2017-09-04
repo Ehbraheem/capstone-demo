@@ -101,6 +101,43 @@ RSpec.describe "ImageContents", type: :request do
 		end
 	end
 
+	context "validation" do
+		include_context "db_clean_after"
+		it_behaves_like "image requires parameter", :content
+		it_behaves_like "image requires parameter", :content_type
+
+		it "image requires valid content" do
+			start_count = Image.count
+			image_props[:image_content][:content] = "blah blah blah"
+			jpost images_url, image_props
+			expect(response).to have_http_status :unprocessable_entity
+			expect(Image.count).to eq start_count
+
+			payload = parsed_body
+			expect(payload).to include "errors"
+			expect(payload["errors"]).to include "full_messages"
+			expect(payload["errors"]["full_messages"]).to include "unable to create image contents", "no start of image marker found"
+		end
+
+		it "image requires supported content_type" do
+			start_count = Image.count
+			image_props[:image_content][:content_type] = "image/blah"
+			jpost images_url, image_props
+			expect(response).to have_http_status :unprocessable_entity
+			expect(Image.count).to start_count
+
+			payload = parsed_body
+			expect(payload).to include "errors"
+			expect(payload["errors"]).to include "full_messages"
+			expect(payload["errors"]["full_messages"]).to include "unable to create image contents"
+
+			expect(payload["errors"]).to_not include "width"
+			expect(payload["errors"]).to_not include "height"
+			expect(payload["errors"]).to include "content_type"
+			expect(payload["errors"]["content_type"]).to include /not supported type/
+		end
+	end
+
 end
 
 shared_examples "image requires parameter" do |parameter|
