@@ -4,6 +4,7 @@ namespace :ptourist do
   ORIGINATORS=["carol","alice"]
   BOYS=["greg","peter","bobby"]
   GIRLS=["marsha","jan","cindy"]
+  BASE_URL="https://dev9.jhuep.com/fullstack-capstone"
 
   def user_name first_name
     last_name = (first_name=="alice") ? "nelson" : "brady"
@@ -17,11 +18,9 @@ namespace :ptourist do
     end
     "#{first_name} #{last_name}".titleize
   end
-  
   def user_email first_name
     "#{first_name}@bbunch.org"
   end
-
   def get_user first_name
     User.find_by(:email=>user_email(first_name))
   end
@@ -53,9 +52,21 @@ namespace :ptourist do
 
   def create_image organizer, img
     puts "building image for #{img[:caption]}, by #{organizer.name}"
-    image=Image.create(:creator_id=>organizer.id,:caption=>img[:caption])
+    image=Image.create(:creator_id=>organizer.id,:caption=>img[:caption],:lat=>img[:lat],:lng=>img[:lng])
     organizer.add_role(Role::ORGANIZER, image).save
+    create_image_content img.merge(:image=>image)
   end
+
+  def create_image_content img
+    url="#{BASE_URL}/#{img[:path]}"
+    puts "downloading #{url}"
+    contents = open(url,{ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE}).read
+    original_content=ImageContent.new(:image_id=>img[:image].id,
+                                      :content_type=>"image/jpeg", 
+                                      :content=>BSON::Binary.new(contents))
+    ImageContentCreator.new(img[:image], original_content).build_contents.save!
+  end
+
   def create_thing thing, organizer, members, images
     thing=Thing.create!(thing)
     organizer.add_role(Role::ORGANIZER, thing).save
@@ -69,29 +80,12 @@ namespace :ptourist do
     puts "added members for #{thing.name}: #{first_names(m)}"
     images.each do |img|
       puts "building image for #{thing.name}, #{img[:caption]}, by #{organizer.name}"
-      image=Image.create(:creator_id=>organizer.id,:caption=>img[:caption])
+      image=Image.create(:creator_id=>organizer.id,:caption=>img[:caption],:lat=>img[:lat],:lng=>img[:lng])
       organizer.add_role(Role::ORGANIZER, image).save
       ThingImage.new(:thing=>thing, :image=>image, 
                      :creator_id=>organizer.id)
                 .tap {|ti| ti.priority=img[:priority] if img[:priority]}.save!
-    end
-  end
-
-  def create_museum title, organizer, members
-    things=Thing.all
-    museum = Museum.create!(title: title, description: Faker::Lorem.paragraphs.join, things: things)
-    organizer.add_role(Role::ORGANIZER, museum).save
-    m=members.map { |member|
-      unless (member.id==organizer.id || member.id==mike_user.id)
-        member.add_role(Role::MEMBER, museum).save
-        member
-      end
-    }.select {|r| r}
-    puts "added organizer for #{museum.title}: #{first_names([organizer])}"
-    puts "added members for #{museum.title}: #{first_names(m)}"
-    members.each do |mem|
-      puts "building visitors for #{museum.title} by #{organizer.name}"
-      Excursion.new(:museum=>museum, :user=>mem).save!
+      create_image_content img.merge(:image=>image)
     end
   end
 
@@ -159,7 +153,6 @@ namespace :ptourist do
      :lat=>39.2854217},
     ]
     create_thing thing, organizer, members, images
-    create_museum "Museum Roundhouse", organizer, members
 
     thing={:name=>"Baltimore Water Taxi",
     :description=>"The Water Taxi is more than a jaunt across the harbor; it’s a Baltimore institution and a way of life. Every day, thousands of residents and visitors not only rely on us to take them safely to their destinations, they appreciate our knowledge of the area and our courteous service. And every day, hundreds of local businesses rely on us to deliver customers to their locations.  We know the city. We love the city. We keep the city moving. We help keep businesses thriving. And most importantly, we offer the most unique way to see Baltimore and provide an unforgettable experience that keeps our passengers coming back again and again.",
@@ -347,8 +340,8 @@ Work up a sweat in our 24-hour StayFit Gym, which features Life Fitness® cardio
     organizer=get_user("alice")
     image= {:path=>"db/bta/skyline_water_level.jpg",
      :caption=>"Skyline Water Level",
-     :lng=>-76.6284366, 
-     :lat=>39.2780493
+     :lng=>-76.606205,
+     :lat=>39.281114
      }
     create_image organizer, image
 
@@ -375,10 +368,6 @@ Work up a sweat in our 24-hour StayFit Gym, which features Life Fitness® cardio
      :lat=>39.2858057
      }
     create_image organizer, image
-
-    create_museum "Nassau County Museum of Art", organizer, members
-    create_museum "Polish American Museum", organizer, members
-    create_museum "Queens County Farm Museum", organizer, members
 
     puts "#{Thing.count} things created and #{ThingImage.count("distinct thing_id")} with images"
     puts "#{Image.count} images created and #{ThingImage.count("distinct image_id")} for things"

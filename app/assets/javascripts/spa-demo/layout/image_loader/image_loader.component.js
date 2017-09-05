@@ -7,8 +7,9 @@
 			templateUrl: templateUrl,
 			controller: ImageLoaderController,
 			bindings: {
-				resultDataUrl: "&"
+				resultDataUri: "&"
 			},
+			transclude: true
 		});
 
 		templateUrl.$inject = ["spa-demo.config.APP_CONFIG"];
@@ -23,10 +24,26 @@
 
 			$ctrl.$onInit = function() {
 				console.log("ImageLoaderController", $scope);
+				$scope.$watch(() => $ctrl.file,
+											() => {
+												makeObjectUrl();
+												makeDataUri(); 
+											});
 			}
 
 			return;
 			///////////////////////////////////////////
+			function makeDataUri() {
+				$ctrl.dataUri = null;
+				if ($ctrl.file) {
+					UploadDataUrl.dataUrl($ctrl.file, true).then(
+						dataUri => {
+							$ctrl.dataUri = dataUri;
+							$ctrl.resultDataUri({dataUri: $ctrl.dataUri});
+						});
+				}
+			}
+
 			function makeObjectUrl() {
 				$ctrl.objectUrl = null;
 				if ($ctrl.file) {

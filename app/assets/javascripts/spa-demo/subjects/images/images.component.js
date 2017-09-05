@@ -59,13 +59,14 @@
     ImageEditorController.$inject = ["$scope", "$q",
                                     "$stateParams", "$state",
                                     "spa-demo.authz.Authz",
+                                    "spa-demo.layout.DataUtils",
                                     "spa-demo.subjects.Image",
                                     "spa-demo.subjects.ImageThing",
                                     "spa-demo.subjects.ImageLinkableThing",
                                     ];
 
     function ImageEditorController ($scope, $q, $stateParams, $state, Authz,
-                                    Image, ImageThing, ImageLinkableThing) {
+                                    DataUtils, Image, ImageThing, ImageLinkableThing) {
         var $ctrl = this;
         $ctrl.selected_linkables = [];
         $ctrl.create = create;
@@ -73,6 +74,7 @@
         $ctrl.update = update;
         $ctrl.remove = remove;
         $ctrl.linkThings = linkThings;
+        $ctrl.setImageContent = setImageContent;
 
         $ctrl.$onInit = function () {
             console.log("ImageSelectorController", $scope);
@@ -113,8 +115,16 @@
         }
 
         function clear() {
-            newResource();
-            $state.go(".", {id:null})
+            if (!$ctrl.item.id) {
+                $state.reload();
+            } else {
+                $state.go(".", {id:null})
+            }
+        }
+
+        function setImageContent(dataUri) {
+            console.log("setImageContent", dataUri ? dataUri.length : null);
+            $ctrl.item.image_content = DataUtils.getContentFromDataUri(dataUri);
         }
         
         function create() {
