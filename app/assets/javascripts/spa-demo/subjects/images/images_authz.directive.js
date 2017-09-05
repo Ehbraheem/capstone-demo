@@ -66,7 +66,7 @@
                 vm.authz.canUpdate     = false;
                 vm.authz.canDelete     = false;
                 vm.authz.canGetDetails = false;
-                item.$promise.then( (item) => checkAccess(item); );
+                item.$promise.then( item => checkAccess(item) );
             } else {
                 checkAccess(item);
             }

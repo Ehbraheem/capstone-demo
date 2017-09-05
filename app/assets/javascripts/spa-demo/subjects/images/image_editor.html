@@ -11,6 +11,11 @@
                     ng-src="{{$ctrl.item.content_url}}?width=250"
                     ng-if="$ctrl.item.content_url"/>
             </div>
+
+            <sd-image-loader 
+                class="image-select"
+                ng-if="!$ctrl.item.id && $ctrl.authz.canCreate">
+            </sd-image-loader>
         </div>
     </div>
 

@@ -1,0 +1,13 @@
+<input name="image-file"
+			 type="file"
+			 accept=".jpeg"
+			 ng-hide="$ctrl.file"
+			 required="true"
+			 ngf-select
+			 ng-model="$ctrl.file">
+			 
+<img class="img-responsive image-preview"
+		 ng-src="{{$ctrl.objectUrl}}"
+		 ng-show="$ctrl.file && $ctrl.objectUrl"></img>
+
+<button ng-click="$ctrl.debug()">Debug</button>

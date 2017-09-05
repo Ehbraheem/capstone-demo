@@ -28,7 +28,7 @@ class ImageContent
   		query = where({})
   		query = query.where(width: {:$gte=> min_width}) if min_width
   		query = query.where(height: {:$gte=> min_height}) if min_height
-  		query.order(width.asc, height.asc).limit(1)
+  		query.order(:width.asc, :height.asc).limit(1)
   	else
   		order(:width.desc, height.desc).limit(1)
   	end

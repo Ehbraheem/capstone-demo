@@ -6,6 +6,8 @@
 //= require angular-resource
 //= require angular-cookie
 //= require ng-token-auth
+//= require ng-file-upload-shim
+//= require ng-file-upload
 
 // Add our files to the manifest for AP load
 //= require spa-demo/app.module
@@ -53,5 +55,9 @@
 // Authz modules
 //= require spa-demo/authz/authz.module
 //= require spa-demo/authz/authz.service
+
+// File Upload
+//= require spa-demo/layout/image_loader/data_utils.service
+//= require spa-demo/layout/image_loader/image_loader.component
 
 //= require spa-demo/authz/base_policy.service

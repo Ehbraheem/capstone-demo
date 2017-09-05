@@ -69,7 +69,7 @@
                 vm.authz.canRemoveImage = false;
                 vm.authz.canUpdateImage = false;
 
-                item.$promise.then( (item) => checkAccess(item););
+                item.$promise.then( item => checkAccess(item) );
             } else {
                 checkAccess(item);
             }

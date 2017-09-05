@@ -5,7 +5,7 @@ class ImagesController < ApplicationController
   after_action :verify_authorized, except: [:content]
   after_action :verify_policy_scoped, only: [:index]
 
-  rescue_from EXIF::MalformedJPEG, with: :contents_error
+  rescue_from EXIFR::MalformedJPEG, with: :contents_error
 
   # GET /images
   # GET /images.json
@@ -19,7 +19,7 @@ class ImagesController < ApplicationController
   end
 
   def content
-    result = ImageContent.image(@image).smallest(params[:width]), params[:height]).first
+    result = ImageContent.image(@image).smallest(params[:width], params[:height]).first
     if result
       expires_in 1.year, public: true
       if stale? result

@@ -8,6 +8,7 @@
     angular
         .module("spa-demo", [
             "ui.router",
+            "ngFileUpload",
             "spa-demo.config",
             "spa-demo.foos",
             "spa-demo.authn",
