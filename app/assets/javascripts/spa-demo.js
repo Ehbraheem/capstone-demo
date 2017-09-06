@@ -8,6 +8,7 @@
 //= require ng-token-auth
 //= require ng-file-upload-shim
 //= require ng-file-upload
+//= require ui-cropper
 
 // Add our files to the manifest for AP load
 //= require spa-demo/app.module
