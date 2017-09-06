@@ -46,6 +46,11 @@ img.image-preview {
 	overflow: visible;
 }
 
+/* image viewer */
+sd-image-viewer img {
+	width: 100%;
+}
+
 /** media queries */
 
 /** Large */
@@ -81,5 +86,5 @@ img.image-preview {
 
 /* Super-Extra Small */
 @media (max-width: 479px){
-	
+
 }
