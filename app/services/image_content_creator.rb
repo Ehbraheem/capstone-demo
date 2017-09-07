@@ -10,6 +10,19 @@ class ImageContentCreator
 		@contents << @original
 	end
 
+	def self.annotate text, content
+		image = MiniMagick::Image.read(content)
+		image.combine_options do |c|
+			c.pointsize 400
+			c.fill "white"
+			c.gravity "center"
+			c.draw "text 0,0 '#{text}'"
+		end
+		result = StringIO.new
+		image.write(result)
+		result.string
+	end
+
 	def build_contents sizes=nil
 		sizes ||= [ImageContent::THUMBNAIL, ImageContent::SMALL,
 							 ImageContent::MEDIUM, ImageContent::LARGE]
@@ -20,7 +33,11 @@ class ImageContentCreator
 	def build_size size 
 		mm_image = MiniMagick::Image.read @original.content.data
 		mm_image.format "jpg"
-		mm_image.image.resize size
+		mm_image.image.resize size+"^"
+		mm_image.combine_options do |c|
+			c.gravity "center"
+			c.crop size+"+0+0"
+		end
 		new_contents = StringIO.new
 		mm_image.write new_contents
 		ImageContent.new image_id: image.id,
