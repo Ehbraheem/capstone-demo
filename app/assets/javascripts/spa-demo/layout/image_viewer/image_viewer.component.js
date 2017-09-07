@@ -8,7 +8,8 @@
 			controller: ImageViewerController,
 			bindings: {
 				name: "@",
-				images: "<"
+				images: "<",
+				minWidth: "@"
 			}
 		});
 
@@ -17,8 +18,8 @@
 			return APP_CONFIG.image_viewer_html;
 		}
 
-		ImageViewerController.$inject = ["$scope"];
-		function ImageViewerController($scope) {
+		ImageViewerController.$inject = ["$scope", "$element", "spa-demo.layout.ImageQuerySize"];
+		function ImageViewerController($scope, $element, ImageQuerySize) {
 			const $ctrl = this;
 			$ctrl.imageId = imageId;
 			$ctrl.imageUrl = imageUrl;
@@ -26,19 +27,43 @@
 			$ctrl.imageCaption = imageCaption;
 			$ctrl.nextImage = nextImage;
 			$ctrl.previousImage = previousImage;
+			let sizing = null;
 
 			$ctrl.$onInit = () => {
+				$ctrl.currentIndex = 0;
 				console.log($ctrl.name, "ImageViewerController", $scope);
+			}
+
+			$ctrl.$postLink = () => {
+				sizing = new ImageQuerySize($element.find('div'), this.minWidth);
+				$ctrl.queryString = sizing.queryString();
+				sizing.listen(resizeHandler);
+			}
+
+			$ctrl.$onDestroy = () => {
+				sizing.nolisten(resizeHandler);
 			}
 			return;
 			/////////////////////////
+			function resizeHandler(event) {
+				console.log("window resized");
+				if (sizing.updateSizes($ctrl.minWidth)) {
+					$ctrl.queryString = sizing.queryString();
+					console.log("new query size", $ctrl.queryString);
+					$scope.$apply();
+				}
+			}
+
 			function isCurrentIndex(index) {
 				return index === $ctrl.currentIndex;
 			}
 
-			function imageId(object) {
+			function imageUrl(object) {
 				if (!object) { return null; }
-				return object.image_id ? object.image_content_url : object.content_url;
+				const url = object.image_id ? object.image_content_url : object.content_url;
+				url += $ctrl.queryString;
+				console.log($ctrl.name, "url=", url);
+				return url;
 			}
 
 			function setCurrentIndex(index) {
@@ -56,7 +81,7 @@
 				}
 			}
 
-			function imageUrl(object) {
+			function imageId(object) {
 				if (!object) { return null; }
 				return object.image_id ? object.image_id : object.id;
 			}
